@@ -1,6 +1,8 @@
 Schema Sync v0.9.0
 +++++++++++++++++++
 a MySQL schema synchronization utility
+http://www.schemasync.org
+
 
 SYNOPSIS
 ========
