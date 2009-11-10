@@ -7,7 +7,7 @@ SYNOPSIS
 schemasync [options] <source> <target>
 
 # source/target format: mysql://user:pass@host:port/database
-# output format: <database>[_<tag>].DDMMYYYY.(patch|revert)[_<version>].sql
+# output format: <database>[_<tag>].YYYYMMDD.(patch|revert)[_<version>].sql
 
 
 DESCRIPTION
