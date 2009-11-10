@@ -50,20 +50,15 @@ Prerequisites
     - Python 2.4, 2.5, or 2.6
     - MySQL <http://www.mysql.com/>, version 5.0 or higher
     - MySQLdb <http://sourceforge.net/projects/mysql-python>, version 1.2.1p2 or higher
-    - SchemaObject <http://matuson.com/code/schemaobject> 0.5.1 or higher (auto installed via easy_install schemasync)
+    - SchemaObject <http://matuson.com/code/schemaobject> 0.5.1 or higher
 * To run the test suite, you need to install a copy of the Sakila Database <http://dev.mysql.com/doc/sakila/en/sakila.html>, version 0.8
 
 Installation
 ------------
-Download http://matuson.com/code/schemasync-0.9.tar.gz
-tar xvzf schemasync-0.9.tar.gz
-cd schemasync-0.9
-sudo python setup.py install
- 
-Installing via easy_install
----------------------------
-    sudo apt-get install python-mysqldb
-    sudo easy_install schemaobject==0.5.1 schemasync
+    Download http://www.schemasync.org/downloads/schemasync-0.9.tar.gz
+    tar xvzf schemasync-0.9.tar.gz
+    cd schemasync-0.9
+    sudo python setup.py install
 
 Installing the latest development version
 -----------------------------------------
