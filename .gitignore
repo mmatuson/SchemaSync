@@ -1,0 +1,7 @@
+build/
+dist/
+docs/
+*egg-info
+*.pyc
+.* # Ignore all dotfiles...
+!.gitignore # except for .gitignore
