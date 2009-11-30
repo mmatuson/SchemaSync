@@ -20,7 +20,7 @@ Schema Sync will generate the SQL necessary to migrate the schema of a source da
 * Schema Sync does not yet recognize Tables or Columns that have been renamed. A rename will result in the old table or column being dropped and the new one added. 
 * All ADD|MODIFY COLUMN statements have the AFTER (or FIRST) SQL syntax even if no move is required. 
 * COMMENTS and AUTO_INCREMENT values are not by synced by default. See help (-h) for details.
-
+* Partitions (MySQL 5.1+) are not yet supported
 
 OPTIONS
 =================
@@ -55,18 +55,14 @@ Prerequisites
     - SchemaObject <http://matuson.com/code/schemaobject> 0.5.1 or higher
 * To run the test suite, you need to install a copy of the Sakila Database <http://dev.mysql.com/doc/sakila/en/sakila.html>, version 0.8
 
-Installation
+Standard Installation
 ------------
     Download http://www.schemasync.org/downloads/schemasync-0.9.tar.gz
     tar xvzf schemasync-0.9.tar.gz
-    cd schemasync-0.9
-    sudo python setup.py install
-
-Installing the latest development version
------------------------------------------
-    git clone git://github.com/mmatuson/SchemaSync.git
     cd schemasync
     sudo python setup.py install
+
+For other installation instructions, see http://www.schemasync.org/install.htm
 
 
 Status & License
