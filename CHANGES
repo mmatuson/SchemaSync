@@ -1,2 +1,9 @@
+== 0.9.0 / 2009-12-02
+    * Updated SchemaObject dependancy to version >= 0.5.2
+        * Fixes: 
+            - Column DEFAULT now quoted if string
+            - CHARACTER SET, COLLATE omitted if same as parent Table
+            - Column definition syntax bug fixed
+    
 == 0.9.0 / 2009-11-10
     * Initial Public Release
