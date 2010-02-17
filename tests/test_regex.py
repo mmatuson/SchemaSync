@@ -165,6 +165,17 @@ class TestDistantSemiColonRegex(unittest.TestCase):
         matches = REGEX_DISTANT_SEMICOLIN.search(s)
         self.assertTrue(matches)
 
+    def test_ignore_in_string(self):
+        """Test REGEX_DISTANT_SEMICOLIN ignore when in string"""
+        s = """ALTER TABLE `foo` COMMENT 'hello  ;'  ;"""
+        matches = REGEX_DISTANT_SEMICOLIN.findall(s)
+        self.assertEqual(len(matches), 1)
+        self.assertEqual(matches, ['  ;'])
+        
+        s = """ALTER TABLE `foo` COMMENT 'hello  ;';"""
+        matches = REGEX_DISTANT_SEMICOLIN.findall(s)
+        self.assertFalse(matches)
+            
     def test_no_match(self):
         """Test REGEX_DISTANT_SEMICOLIN with no spaces"""
         s = "CREATE DATABSE foobar;"
