@@ -8,9 +8,11 @@ import cStringIO
 
 #REGEX_NO_TICKS = re.compile('`')
 #REGEX_INT_SIZE = re.compile('int\(\d+\)')
-REGEX_MULTI_SPACE = re.compile('\s\s+')
-REGEX_DISTANT_SEMICOLIN = re.compile('\s;')
-REGEX_FILE_COUNTER = re.compile("\_(?P<i>[0-9]+)\.")
+REGEX_MULTI_SPACE = re.compile(r'\s\s+')
+REGEX_DISTANT_SEMICOLIN = re.compile(r'\s;')
+REGEX_FILE_COUNTER = re.compile(r"\_(?P<i>[0-9]+)\.(?:[^\.]+)$")
+REGEX_TABLE_COMMENT = re.compile(r"COMMENT(?:(?:\s*=\s*)|\s*)'(.*?)'", re.I)
+REGEX_TABLE_AUTO_INC = re.compile(r"AUTO_INCREMENT(?:(?:\s*=\s*)|\s*)(\d+)", re.I)
 
 
 def versioned(filename):

@@ -1,7 +1,4 @@
-import re
-
-REGEX_TABLE_COMMENT = r"COMMENT(=|\s)'(.*)'"
-REGEX_TABLE_AUTO_INC = r"AUTO_INCREMENT=(\d+)"
+from utils import REGEX_TABLE_AUTO_INC, REGEX_TABLE_COMMENT
 
 
 def sync_schema(fromdb, todb, options):
@@ -71,18 +68,18 @@ def sync_table(from_table, to_table, options):
     """
     for p, r in sync_created_columns(from_table.columns,
                                      to_table.columns,
-                                     sync_comments = options['sync_comments']):
+                                     sync_comments=options['sync_comments']):
         yield (p, r)
 
     for p, r in sync_dropped_columns(from_table.columns,
                                     to_table.columns,
-                                    sync_comments = options['sync_comments']):
+                                    sync_comments=options['sync_comments']):
         yield (p, r)
 
     if from_table and to_table:
         for p, r in sync_modified_columns(from_table.columns,
                                           to_table.columns,
-                                          sync_comments = options['sync_comments']):
+                                          sync_comments=options['sync_comments']):
             yield (p, r)
 
         # add new indexes, then compare existing indexes for changes
@@ -167,11 +164,11 @@ def sync_created_tables(from_tables, to_tables,
         if t not in to_tables:
             p, r = from_tables[t].create(), from_tables[t].drop()
             if not sync_auto_inc:
-                p = re.sub(REGEX_TABLE_AUTO_INC, '', p)
-                r = re.sub(REGEX_TABLE_AUTO_INC, '', r)
+                p = REGEX_TABLE_AUTO_INC.sub('', p)
+                r = REGEX_TABLE_AUTO_INC.sub('', r)
             if not sync_comments:
-                p = re.sub(REGEX_TABLE_COMMENT, '', p)
-                r = re.sub(REGEX_TABLE_COMMENT, '', r)
+                p = REGEX_TABLE_COMMENT.sub('', p)
+                r = REGEX_TABLE_COMMENT.sub('', r)
 
             yield p, r
 
@@ -194,11 +191,11 @@ def sync_dropped_tables(from_tables, to_tables,
         if t not in from_tables:
             p, r = to_tables[t].drop(), to_tables[t].create()
             if not sync_auto_inc:
-                p = re.sub(REGEX_TABLE_AUTO_INC, '', p)
-                r = re.sub(REGEX_TABLE_AUTO_INC, '', r)
+                p = REGEX_TABLE_AUTO_INC.sub('', p)
+                r = REGEX_TABLE_AUTO_INC.sub('', r)
             if not sync_comments:
-                p = re.sub(REGEX_TABLE_COMMENT, '', p)
-                r = re.sub(REGEX_TABLE_COMMENT, '', r)
+                p = REGEX_TABLE_COMMENT.sub('', p)
+                r = REGEX_TABLE_COMMENT.sub('', r)
 
             yield p, r
 
@@ -318,7 +315,7 @@ def sync_modified_columns(from_cols, to_cols, sync_comments=False):
 
         if ((from_idx != to_idx) or
             (to_cols[name] != from_cols[name]) or
-            (sync_comments and from_cols[name].comment != to_cols[name].comment)):
+            (sync_comments and (from_cols[name].comment != to_cols[name].comment))):
 
             # move the element to its correct spot as we do comparisons
             # this will prevent a domino effect of off-by-one false positives.
@@ -334,9 +331,6 @@ def sync_modified_columns(from_cols, to_cols, sync_comments=False):
             tprev = get_previous_item(to_cols.keys(), name)
             yield (from_cols[name].modify(after=fprev, with_comment=sync_comments),
                    to_cols[name].modify(after=tprev, with_comment=sync_comments))
-
-            if from_names == to_names:
-                raise StopIteration
 
 
 def sync_created_constraints(src, dest):

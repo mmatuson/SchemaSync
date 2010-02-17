@@ -73,7 +73,7 @@ class TestSyncColumns(unittest.TestCase):
         self.assertEqual(i, 0)
 
     def test_sync_modified_column(self):
-        """Test: columns in src table have been modified in dest table (ignore Column COMMENT)"""
+        """Test: column in src table have been modified in dest table (ignore Column COMMENT)"""
         self.dest.columns['rental_date'].type = "TEXT"
         self.dest.columns['rental_date'].null = True
         self.dest.columns['rental_date'].comment = "hello world"
@@ -84,6 +84,23 @@ class TestSyncColumns(unittest.TestCase):
 
         self.assertEqual(i, 0)
 
+    def test_sync_multiple_modified_columns(self):
+        """Test: multiple columns in src table have been modified in dest table (ignore Column COMMENT)"""
+        self.dest.columns['rental_date'].type = "TEXT"
+        self.dest.columns['rental_date'].null = True
+        self.dest.columns['rental_date'].comment = "hello world"
+        self.dest.columns['return_date'].type = "TIMESTAMP"
+        
+        for i, (p,r) in enumerate(syncdb.sync_modified_columns(self.src.columns, self.dest.columns, sync_comments=False)):
+            if i == 0:
+                self.assertEqual(p, "MODIFY COLUMN `rental_date` DATETIME NOT NULL AFTER `rental_id`")
+                self.assertEqual(r, "MODIFY COLUMN `rental_date` TEXT NULL AFTER `rental_id`")
+            if i == 1:
+                self.assertEqual(p, "MODIFY COLUMN `return_date` DATETIME NULL AFTER `customer_id`")
+                self.assertEqual(r, "MODIFY COLUMN `return_date` TIMESTAMP NULL AFTER `customer_id`")
+
+        self.assertEqual(i, 1)
+            
     def test_sync_modified_column_with_comments(self):
         """Test: columns in src table have been modified in dest table (include Column COMMENT)"""
         self.dest.columns['rental_date'].type = "TEXT"

@@ -5,8 +5,8 @@ ez_setup.use_setuptools()
 from setuptools import setup
 
 setup(
-    name='Schema Sync',
-    version='0.9',
+    name='SchemaSync',
+    version='0.9.1',
     description='A MySQL Schema Synchronization Utility',
     author='Mitch Matuson',
     packages=['schemasync'],
@@ -16,9 +16,9 @@ setup(
             'schemasync = schemasync.schemasync:main',
         ]
     },
-    
+
     keywords = ["MySQL", "database", "schema", "migration", "SQL"],
-    
+
     classifiers = [
       "Environment :: Console",
       "Intended Audience :: Information Technology",
@@ -32,7 +32,7 @@ setup(
       "Topic :: Software Development :: Code Generators",
       "Topic :: Utilities",
       ],
-      
+
       long_description = """\
       Schema Sync will generate the SQL necessary to migrate the schema of a source database to a target database (patch script), as well as a the SQL necessary to undo the changes after you apply them (revert script).
       """

@@ -5,6 +5,7 @@ from test_sync_tables import TestSyncTables
 from test_sync_columns import TestSyncColumns
 from test_sync_constraints import TestSyncConstraints
 from test_utils import TestVersioned, TestPNames, TestPatchBuffer
+from test_regex import TestTableCommentRegex, TestTableAutoIncrementRegex, TestMultiSpaceRegex,TestFileCounterRegex,TestDistantSemiColonRegex
 
 def get_database_url():
     database_url = raw_input("\nTests need to be run against the Sakila Database v0.8\n"
@@ -17,6 +18,11 @@ def get_database_url():
 
 def regressionTest():
     test_cases = [
+                  TestTableCommentRegex,
+                  TestTableAutoIncrementRegex,
+                  TestMultiSpaceRegex,
+                  TestDistantSemiColonRegex,
+                  TestFileCounterRegex,
                   TestSyncDatabase,
                   TestSyncTables,
                   TestSyncColumns,
