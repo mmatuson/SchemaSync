@@ -1,3 +1,6 @@
+== 0.9.2 / 2010-12-05
+    * Added MANIFEST.in so ez_setup.py is included for users without setuptools
+    
 == 0.9.1 / 2010-02-16
     * Bug Fix: Table/Column COMMENT and AUTO_INCREMENT Regular Expression is Greedy
     * Bug Fix: Column sync misses columns changes once sequence is in order
