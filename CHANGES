@@ -1,18 +1,18 @@
 == 0.9.2 / 2010-12-05
     * Added MANIFEST.in so ez_setup.py is included for users without setuptools
-    
+
 == 0.9.1 / 2010-02-16
     * Bug Fix: Table/Column COMMENT and AUTO_INCREMENT Regular Expression is Greedy
     * Bug Fix: Column sync misses columns changes once sequence is in order
     * Improved file version Regular Expression
     * Added tests for all Regular Expressions
-    
+
 == 0.9.0 / 2009-12-02
     * Updated SchemaObject dependancy to version >= 0.5.2
-        * Fixes: 
+        * Fixes:
             - Column DEFAULT now quoted if string
             - CHARACTER SET, COLLATE omitted if same as parent Table
             - Column definition syntax bug fixed
-    
+
 == 0.9.0 / 2009-11-10
     * Initial Public Release
