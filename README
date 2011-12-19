@@ -16,9 +16,9 @@ DESCRIPTION
 ===========
 Schema Sync will generate the SQL necessary to migrate the schema of a source database to a target database (patch script), as well as a the SQL necessary to undo the changes after you apply them (revert script).
 
-* Schema Sync does not alter your database. It only generates the .sql files containing the differences. You must apply the changes. 
-* Schema Sync does not yet recognize Tables or Columns that have been renamed. A rename will result in the old table or column being dropped and the new one added. 
-* All ADD|MODIFY COLUMN statements have the AFTER (or FIRST) SQL syntax even if no move is required. 
+* Schema Sync does not alter your database. It only generates the .sql files containing the differences. You must apply the changes.
+* Schema Sync does not yet recognize Tables or Columns that have been renamed. A rename will result in the old table or column being dropped and the new one added.
+* All ADD|MODIFY COLUMN statements have the AFTER (or FIRST) SQL syntax even if no move is required.
 * COMMENTS and AUTO_INCREMENT values are not by synced by default. See help (-h) for details.
 * Partitions (MySQL 5.1+) are not yet supported
 
@@ -30,16 +30,16 @@ OPTIONS
                       if a file with the same name already exists.
 -a, --sync-auto-inc   sync the AUTO_INCREMENT value for each table.
 -c, --sync-comments   sync the COMMENT field for all tables AND columns
---tag=TAG             tag the migration scripts as <database>_<tag>. 
+--tag=TAG             tag the migration scripts as <database>_<tag>.
                       Valid characters include [A-Za-z0-9-_]
 --output-directory=OUTPUT_DIRECTORY
-                    directory to write the migration scrips. 
-                    The default is current working directory. 
+                    directory to write the migration scrips.
+                    The default is current working directory.
                     Must use absolute path if provided.
 --log-directory=LOG_DIRECTORY
-                    set the directory to write the log to. 
-                    Must use absolute path if provided. 
-                    Default is output directory. 
+                    set the directory to write the log to.
+                    Must use absolute path if provided.
+                    Default is output directory.
                     Log filename is schemasync.log
 
 
@@ -62,7 +62,7 @@ For installation instructions, see http://www.schemasync.org/install.htm
 
 Status & License
 ================
-Schema Sync is under active development and released under the Apache License, Version 2.0 <http://www.apache.org/licenses/LICENSE-2.0>. 
+Schema Sync is under active development and released under the Apache License, Version 2.0 <http://www.apache.org/licenses/LICENSE-2.0>.
 
 You can obtain a copy of the latest source code from the Git repository <http://github.com/mmatuson/SchemaSync>, or fork it on Github <http://www.github.com>.
 
