@@ -66,16 +66,6 @@ def sync_table(from_table, to_table, options):
     Yields:
         A tuple (patch, revert) containing the next SQL statements
     """
-    for p, r in sync_created_columns(from_table.columns,
-                                     to_table.columns,
-                                     sync_comments=options['sync_comments']):
-        yield (p, r)
-
-    for p, r in sync_dropped_columns(from_table.columns,
-                                    to_table.columns,
-                                    sync_comments=options['sync_comments']):
-        yield (p, r)
-
     if from_table and to_table:
         for p, r in sync_modified_columns(from_table.columns,
                                           to_table.columns,
@@ -115,6 +105,15 @@ def sync_table(from_table, to_table, options):
         if p:
             yield (p, r)
 
+    for p, r in sync_created_columns(from_table.columns,
+                                     to_table.columns,
+                                     sync_comments=options['sync_comments']):
+        yield (p, r)
+
+    for p, r in sync_dropped_columns(from_table.columns,
+                                    to_table.columns,
+                                    sync_comments=options['sync_comments']):
+        yield (p, r)
 
 def sync_database_options(from_db, to_db):
     """Generate the SQL statements needed to modify the Database options
