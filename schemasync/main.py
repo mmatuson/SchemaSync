@@ -1,10 +1,5 @@
 #!/usr/bin/python
 
-__author__ = "Mitch Matuson"
-__copyright__ = "Copyright 2009 Mitch Matuson"
-__version__ = "0.9.1"
-__license__ = "Apache 2.0"
-
 import re
 import sys
 import os
@@ -15,6 +10,9 @@ import syncdb
 import utils
 import warnings
 
+import schemasync
+from schemasync import schemaobject
+
 # supress MySQLdb DeprecationWarning in Python 2.6
 warnings.simplefilter("ignore", DeprecationWarning)
 
@@ -24,15 +22,8 @@ except ImportError:
     print "Error: Missing Required Dependency MySQLdb."
     sys.exit(1)
 
-try:
-    import schemaobject
-except ImportError:
-    print "Error: Missing Required Dependency SchemaObject"
-    sys.exit(1)
-
-
-APPLICATION_VERSION = __version__
-APPLICATION_NAME = "Schema Sync"
+APPLICATION_VERSION = schemasync.__version__
+APPLICATION_NAME = schemasync.__name__
 LOG_FILENAME = "schemasync.log"
 DATE_FORMAT = "%Y%m%d"
 TPL_DATE_FORMAT = "%a, %b %d, %Y"
@@ -108,7 +99,7 @@ def parse_cmd_line(fn):
 
 
         if options.show_version:
-            print APPLICATION_NAME, __version__
+            print APPLICATION_NAME, APPLICATION_VERSION
             return 0
 
         if (not args) or (len(args) != 2):

@@ -5,15 +5,15 @@ ez_setup.use_setuptools()
 from setuptools import setup
 
 setup(
-    name='SchemaSync',
-    version='0.9.2',
+    name='Schema Sync',
+    version='0.10.0',
     description='A MySQL Schema Synchronization Utility',
     author='Mitch Matuson',
     packages=['schemasync'],
-    install_requires=['SchemaObject >=0.5.3'],
+    install_requires=[],
     entry_points={
         'console_scripts': [
-            'schemasync = schemasync.schemasync:main',
+            'schemasync = schemasync.main:main',
         ]
     },
 

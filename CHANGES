@@ -1,3 +1,7 @@
+== 0.10.0 / 2012-02-11
+	* Merged SchemaObject package into this project
+	* Cleaned up various files
+	
 == 0.9.2 / 2010-12-05
     * Added MANIFEST.in so ez_setup.py is included for users without setuptools
     
@@ -8,7 +12,7 @@
     * Added tests for all Regular Expressions
     
 == 0.9.0 / 2009-12-02
-    * Updated SchemaObject dependancy to version >= 0.5.2
+    * Updated SchemaObject dependency to version >= 0.5.2
         * Fixes: 
             - Column DEFAULT now quoted if string
             - CHARACTER SET, COLLATE omitted if same as parent Table
