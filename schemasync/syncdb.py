@@ -47,9 +47,19 @@ def sync_schema(fromdb, todb, options):
             rlist.append(r)
 
         if plist and rlist:
-            p = "%s %s;" % (to_table.alter(), ', '.join(plist))
-            r = "%s %s;" % (to_table.alter(), ', '.join(rlist))
-            yield p, r
+	    # every expression in alter line must be separate SQL request, not united SQL.
+	    p = "\n";
+	    for i in plist:
+	        p = "%s %s %s;" % (p, to_table.alter(), i)
+	        p = p + "\n"
+	    
+	    r = "\n";
+	    for i in rlist:
+	        r = "%s %s %s;" % (r, to_table.alter(), i)
+	        r = r + "\n"
+
+
+        yield p, r
 
 
 def sync_table(from_table, to_table, options):
