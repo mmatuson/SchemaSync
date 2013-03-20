@@ -43,7 +43,7 @@ def versioned(filename):
     return name + ('_%d' % i) + ext
 
 
-def create_pnames(db, tag=None, date_format="%Y%m%d"):
+def create_pnames(db, tag=None, date_format="%Y%m%d", no_date=False):
     """Returns a tuple of the filenames to use to create the migration scripts.
        Filename format: <db>[_<tag>].<date=DATE_FORMAT>.(patch|revert).sql
 
@@ -60,6 +60,8 @@ def create_pnames(db, tag=None, date_format="%Y%m%d"):
     if tag:
         tag = re.sub('[^A-Za-z0-9_-]', '', tag)
         basename = "%s_%s.%s" % (db, tag, d)
+    elif no_date:
+        basename = "%s" % (db)
     else:
         basename = "%s.%s" % (db, d)
 

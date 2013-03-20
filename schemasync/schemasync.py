@@ -85,6 +85,12 @@ def parse_cmd_line(fn):
                           help=("sync the COMMENT field for all "
                                 "tables AND columns"))
 
+        parser.add_option("-D", "--no-date",
+                          dest="no_date",
+                          action="store_true",
+                          default=False,
+                          help=("removes the date from the file format "))
+
         parser.add_option("--tag",
                          dest="tag",
                          help=("tag the migration scripts as <database>_<tag>."
@@ -118,6 +124,7 @@ def parse_cmd_line(fn):
         return fn(*args, **dict(version_filename=options.version_filename,
                                  output_directory=options.output_directory,
                                  log_directory=options.log_directory,
+                                 no_date=options.no_date,
                                  tag=options.tag,
                                  sync_auto_inc=options.sync_auto_inc,
                                  sync_comments=options.sync_comments))
@@ -125,7 +132,7 @@ def parse_cmd_line(fn):
 
 
 def app(sourcedb='', targetdb='', version_filename=False,
-        output_directory=None, log_directory=None,
+        output_directory=None, log_directory=None, no_date=False,
         tag=None, sync_auto_inc=False, sync_comments=False):
     """Main Application"""
 
@@ -210,9 +217,10 @@ def app(sourcedb='', targetdb='', version_filename=False,
                target_database=target_obj.selected.name,
                created=datetime.datetime.now().strftime(TPL_DATE_FORMAT))
 
-    p_fname, r_fname = utils.create_pnames(target_obj.selected.name, 
+    p_fname, r_fname = utils.create_pnames(target_obj.selected.name,
                                            tag=tag,
-                                           date_format=DATE_FORMAT)
+                                           date_format=DATE_FORMAT,
+                                           no_date=no_date)
 
     ctx['type'] = "Patch Script"
     pBuffer = utils.PatchBuffer(name=os.path.join(output_directory, p_fname),
