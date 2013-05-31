@@ -43,13 +43,9 @@ def sync_schema(fromdb, todb, options):
         plist = []
         rlist = []
         for p, r in sync_table(from_table, to_table, options):
-            plist.append(p)
-            rlist.append(r)
-
-        if plist and rlist:
-            p = "%s %s;" % (to_table.alter(), ', '.join(plist))
-            r = "%s %s;" % (to_table.alter(), ', '.join(rlist))
-            yield p, r
+			pAlter = "%s %s;"% (to_table.alter(),p)
+			rAlter = "%s %s;"% (to_table.alter(),r)
+            yield pAlter,rAlter
 
 
 def sync_table(from_table, to_table, options):
