@@ -85,6 +85,11 @@ def parse_cmd_line(fn):
                           help=("sync the COMMENT field for all "
                                 "tables AND columns"))
 
+        parser.add_option("--charset",
+                          dest="charset",
+                          default='utf8',
+                          help=("set the connection charset, default: utf8"))
+
         parser.add_option("--tag",
                          dest="tag",
                          help=("tag the migration scripts as <database>_<tag>."
@@ -119,6 +124,7 @@ def parse_cmd_line(fn):
                                  output_directory=options.output_directory,
                                  log_directory=options.log_directory,
                                  tag=options.tag,
+                                 charset=options.charset,
                                  sync_auto_inc=options.sync_auto_inc,
                                  sync_comments=options.sync_comments))
     return processor
@@ -126,7 +132,7 @@ def parse_cmd_line(fn):
 
 def app(sourcedb='', targetdb='', version_filename=False,
         output_directory=None, log_directory=None,
-        tag=None, sync_auto_inc=False, sync_comments=False):
+        tag=None, charset=None, sync_auto_inc=False, sync_comments=False):
     """Main Application"""
 
     options = locals()
@@ -186,8 +192,8 @@ def app(sourcedb='', targetdb='', version_filename=False,
         logging.error("Target database name not provided. Exiting.")
         return 1
 
-    source_obj = schemaobject.SchemaObject(sourcedb)
-    target_obj = schemaobject.SchemaObject(targetdb)
+    source_obj = schemaobject.SchemaObject(sourcedb, charset)
+    target_obj = schemaobject.SchemaObject(targetdb, charset)
 
     if source_obj.version < '5.0.0':
         logging.error("%s requires MySQL version 5.0+ (source is v%s)"
@@ -210,7 +216,7 @@ def app(sourcedb='', targetdb='', version_filename=False,
                target_database=target_obj.selected.name,
                created=datetime.datetime.now().strftime(TPL_DATE_FORMAT))
 
-    p_fname, r_fname = utils.create_pnames(target_obj.selected.name, 
+    p_fname, r_fname = utils.create_pnames(target_obj.selected.name,
                                            tag=tag,
                                            date_format=DATE_FORMAT)
 
