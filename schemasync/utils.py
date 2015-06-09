@@ -48,7 +48,7 @@ def create_pnames(db, tag=None, date_format="%Y%m%d"):
        Filename format: <db>[_<tag>].<date=DATE_FORMAT>.(patch|revert).sql
 
         Args:
-            db: srting, databse name
+            db: string, database name
             tag: string, optional, tag for the filenames
             date_format: string, the current date format
                          Default Format: 21092009
