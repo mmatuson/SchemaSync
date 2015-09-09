@@ -228,7 +228,36 @@ def app(sourcedb='', targetdb='', version_filename=False,
     for patch, revert in syncdb.sync_schema(source_obj.selected,
                                             target_obj.selected, options):
         if patch and revert:
+            if not db_selected:
+                pBuffer.write(target_obj.selected.select() + '\n')
+                rBuffer.write(target_obj.selected.select() + '\n')
+                db_selected = True
 
+            pBuffer.write(patch + '\n')
+            rBuffer.write(revert + '\n')
+
+    for patch, revert in syncdb.sync_views(source_obj.selected, target_obj.selected):
+        if patch and revert:
+            if not db_selected:
+                pBuffer.write(target_obj.selected.select() + '\n')
+                rBuffer.write(target_obj.selected.select() + '\n')
+                db_selected = True
+
+            pBuffer.write(patch + '\n')
+            rBuffer.write(revert + '\n')
+
+    for patch, revert in syncdb.sync_triggers(source_obj.selected, target_obj.selected):
+        if patch and revert:
+            if not db_selected:
+                pBuffer.write(target_obj.selected.select() + '\n')
+                rBuffer.write(target_obj.selected.select() + '\n')
+                db_selected = True
+
+            pBuffer.write(patch + '\n')
+            rBuffer.write(revert + '\n')
+
+    for patch, revert in syncdb.sync_procedures(source_obj.selected, target_obj.selected):
+        if patch and revert:
             if not db_selected:
                 pBuffer.write(target_obj.selected.select() + '\n')
                 rBuffer.write(target_obj.selected.select() + '\n')
