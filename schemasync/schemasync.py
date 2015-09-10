@@ -238,13 +238,15 @@ def app(sourcedb='', targetdb='', version_filename=False,
             pBuffer.write(patch + '\n')
             rBuffer.write(revert + '\n')
 
+    if db_selected:
+        pBuffer.write(target_obj.selected.fk_checks(1) + '\n')
+        rBuffer.write(target_obj.selected.fk_checks(1) + '\n')
+
     for patch, revert in syncdb.sync_views(source_obj.selected, target_obj.selected):
         if patch and revert:
             if not db_selected:
                 pBuffer.write(target_obj.selected.select() + '\n')
                 rBuffer.write(target_obj.selected.select() + '\n')
-                pBuffer.write(target_obj.selected.fk_checks(0) + '\n')
-                rBuffer.write(target_obj.selected.fk_checks(0) + '\n')
                 db_selected = True
 
             pBuffer.write(patch + '\n')
@@ -255,8 +257,6 @@ def app(sourcedb='', targetdb='', version_filename=False,
             if not db_selected:
                 pBuffer.write(target_obj.selected.select() + '\n')
                 rBuffer.write(target_obj.selected.select() + '\n')
-                pBuffer.write(target_obj.selected.fk_checks(0) + '\n')
-                rBuffer.write(target_obj.selected.fk_checks(0) + '\n')
                 db_selected = True
 
             pBuffer.write(patch + '\n')
@@ -267,8 +267,6 @@ def app(sourcedb='', targetdb='', version_filename=False,
             if not db_selected:
                 pBuffer.write(target_obj.selected.select() + '\n')
                 rBuffer.write(target_obj.selected.select() + '\n')
-                pBuffer.write(target_obj.selected.fk_checks(0) + '\n')
-                rBuffer.write(target_obj.selected.fk_checks(0) + '\n')
                 db_selected = True
 
             pBuffer.write(patch + '\n')
@@ -281,9 +279,6 @@ def app(sourcedb='', targetdb='', version_filename=False,
                      target_obj.host, target_obj.selected.name))
     else:
         try:
-            if db_selected:
-                pBuffer.write(target_obj.selected.fk_checks(1) + '\n')
-                rBuffer.write(target_obj.selected.fk_checks(1) + '\n')
             pBuffer.save()
             rBuffer.save()
             logging.info("Migration scripts created for mysql://%s/%s\n"
