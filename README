@@ -1,7 +1,7 @@
 Schema Sync v0.9.2
 +++++++++++++++++++
 a MySQL schema synchronization utility
-http://www.schemasync.org
+http://mmatuson.github.io/SchemaSync/
 
 
 SYNOPSIS
@@ -57,7 +57,7 @@ Prerequisites
 
 Standard Installation
 ---------------------
-For installation instructions, see http://www.schemasync.org/install.htm
+For installation instructions, see http://mmatuson.github.io/SchemaSync/install.htm
 
 
 Status & License
@@ -67,5 +67,3 @@ Schema Sync is under active development and released under the Apache License, V
 You can obtain a copy of the latest source code from the Git repository <http://github.com/mmatuson/SchemaSync>, or fork it on Github <http://www.github.com>.
 
 You can report bugs via the Schema Sync Issues page <http://github.com/mmatuson/SchemaSync/issues>
-
-Comments, questions, and feature requests can be sent to code at matuson com
