@@ -1,0 +1,167 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <meta name="keywords" content="Python, MySQL, Schema Sync, migrations, schema verioning, open-source" />
+    <meta name="description" content="Schema Sync is a MySQL Schema Versioning and Migration Utility that will generate the SQL necessary to migrate the schema of a source database to a target database (patch script), as well as a the SQL necessary to undo the changes after you apply them (revert script)" />
+
+	
+	
+    <title>Schema Sync &#8250; a MySQL Schema Versioning and Migration Utility</title>
+    <link rel="stylesheet" href="screen.css" media="screen,projection" type="text/css" />
+</head>
+
+<body>
+    <div id="top"></div>
+    <div id="content">
+        <div class="notice" style="display: none;"></div>
+            
+        <h1>
+        Schema Sync
+        <span>a MySQL Schema Versioning and Migration Utility</span>
+        </h1>
+        
+        <h2>Synopsis</h2>
+        <div class="section">
+            <pre>
+                <code>schemasync [options] &lt;source&gt; &lt;target&gt;
+                    
+                # source/target format: mysql://user:pass@host:port/database
+                # output format: &lt;database&gt;[_&lt;tag&gt;].YYYYMMDD.(patch|revert)[_&lt;version&gt;].sql</code>
+            </pre>
+        </div>
+        
+        <h2>Description</h2>
+        <div class="section">
+            <p>
+            Schema Sync will generate the SQL necessary to migrate the schema of a source database to a target database (patch script), as well as a the SQL necessary to undo the changes after you apply them (revert script).
+            </p>
+        </div>
+        
+        <div class="section">
+            <ul>
+                <li>Schema Sync does not alter your database. It only generates the .sql files containing the differences. You must apply the changes.</li>
+                <li>All ADD|MODIFY COLUMN statements have the AFTER (or FIRST) SQL syntax even if no move is required.</li>
+                <li>COMMENTS and AUTO_INCREMENT values are not by synced by default. See help (-h) for details.</li>
+                <li>Schema Sync does not yet recognize Tables or Columns that have been renamed. A rename will result in the old table or column being dropped and the new one added.</li>
+                <li><a href="http://dev.mysql.com/doc/refman/5.1/en/partitioning.html">Partitions</a> (MySQL 5.1+) are not yet supported
+            </ul>
+        </div>
+        
+        <h2>Examples</h2>
+        <div class="section">
+        <ol>
+        <li>Sync the production db with the changes from the development db
+<pre>
+<code>
+    schemasync mysql://user:pass@dev-host:3306/dev_db mysql://user:pass@prod-host:3306/production_db
+</code>
+</pre>
+        </li>
+
+        <li>Bob and Sally were working on independent parts of the application that required schema changes. Migrate these changes to the SAN so they can be tested and later rolled up to the production db.
+<pre>
+<code>
+    schemasync --tag="bob" --ouput-dir="/location/of/san/" \
+                   mysql://user:pass@dev-host:3306/dev_db_bob mysql://user:pass@prod-host:3306/production_db</code>
+
+<code>
+    schemasync --tag="sally" --ouput-dir="/location/of/san/" \
+                 mysql://user:pass@dev-host:3306/dev_db_sally mysql://user:pass@prod-host:3306/production_db
+</code>
+</pre>
+        </li>
+
+                
+                
+        </ol>
+        </div>
+        
+        <h2>Options</h2>
+        <div class="section">
+            <pre><code>
+            -h, --help            show this help message and exit
+            -V, --version         show version and exit.
+            -r, --revision        increment the migration script version number
+                                  if a file with the same name already exists.
+            -a, --sync-auto-inc   sync the AUTO_INCREMENT value for each table.
+            -c, --sync-comments   sync the COMMENT field for all tables AND columns
+            --tag=TAG             tag the migration scripts as &lt;database&gt;_&lt;tag&gt;.
+                                  Valid characters include [A-Za-z0-9-_]
+            --output-directory=OUTPUT_DIRECTORY
+                                directory to write the migration scrips.
+                                The default is current working directory.
+                                Must use absolute path if provided.
+            --log-directory=LOG_DIRECTORY
+                                set the directory to write the log to.
+                                Must use absolute path if provided.
+                                Default is output directory.
+                                Log filename is schemasync.log</code></pre>
+        </div>
+        
+       <h2>Download &amp; Install</h2>
+       <div class="section">
+           <h3>Prerequisites</h3>
+           <ul>
+                <li><a href="http://www.python.org">Python</a> 2.4, 2.5, or 2.6</li>
+                <li><a href="http://www.mysql.com/">MySQL</a>, version 5.0 or higher</li>
+                <li><a href="http://sourceforge.net/projects/mysql-python">MySQLdb</a>, version 1.2.1p2 or higher</li>
+                <li><a href="http://matuson.com/code/schemaobject">SchemaObject</a> 0.5.3 or higher (Auto installed with Schema Sync)</li>
+           </ul>
+               <br/>
+             <p>
+                 To run the test suite, you will need to install the <a href="http://dev.mysql.com/doc/sakila/en/sakila.html">Sakila Database</a>, version 0.8<br/>
+             </p>
+             
+             <h3>Installation</h3>
+             <pre>
+             <code>Download <a href="http://www.schemasync.org/downloads/SchemaSync-0.9.2.tar.gz">SchemaSync-0.9.2</a>
+                 
+             tar xvzf SchemaSync-0.9.2.tar.gz
+             cd SchemaSync-0.9.2
+             sudo python setup.py install</code>
+             </pre>
+            
+            <p>
+                To install without root access or install the latest development version, see <a href="install.htm">Installation Instructions</a>.
+            </p>
+        </div>
+
+        <h2>Author</h2>
+        <div class="section">
+            <p>
+            <a rel="author" href="http://www.matuson.com">Mitch Matuson</a> &lt;code at matuson com&gt;
+            </p>
+        </div>
+        
+        <h2>Status &amp; License</h2>
+        <div class="section">
+            <p>
+            Schema Sync is under active development and released under the <a rel="license" href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>. <br />
+            You can follow important notices and updates to Schema Sync on the <a href="updates.htm">Updates page</a>.<br/>
+            You can obtain a copy of the latest source code from the <a href="http://github.com/mmatuson/SchemaSync">Git repository</a>, or fork it on <a href="http://www.github.com">Github</a>.<br />
+            You can report bugs via the <a href="http://github.com/mmatuson/SchemaSync/issues">Schema Sync Issues page</a><br />
+            Comments, questions, and feature requests can be sent to <i>code at matuson com</i><br />
+            Thanks to <a href="http://ronaldbradford.com/" target="_blank">Ronald Bradford</a> for feedback on the design of Schema Sync
+            </p>
+        </div>
+        
+    </div>
+    
+    <div id="footer">
+    &copy; Copyright 2010, <a rel="author" href="http://www.matuson.com">Mitch Matuson</a>
+    </div>
+    
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+    var pageTracker = _gat._getTracker("UA-11534281-1");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+</body>
+
+</html>

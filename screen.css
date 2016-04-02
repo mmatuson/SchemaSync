@@ -1,0 +1,104 @@
+/* reset */
+html,body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,blockquote,th,td { margin:0;padding:0; }
+table { border-collapse:collapse;border-spacing:0; }
+fieldset,img { border:0; }
+address,caption,cite,code,dfn,em,strong,th,var{ font-style:normal; font-weight:normal; }
+ol,ul { list-style:none; }
+caption,th { text-align:left; }
+h1,h2,h3,h4,h5,h6{ font-size:100%;font-weight:normal; }
+a:hover {text-decoration:none;}
+
+/* main */
+body { 
+  background-color: #FFFFFF; 
+  color: #333; /*#DFDFDF */
+  font-family:"lucida grande",tahoma,verdana,arial,sans-serif;
+  font-size: 12px; 
+  line-height: 1.5em;
+}
+
+#top { 
+  margin: 0;
+  background-color: #f2f2f2;
+  height: 14px;
+  border-bottom: 1px solid #DFDFDF;
+}
+
+#footer { 
+    color: #333; font-size: 11px; text-align: center;
+    margin: 25px auto;
+    background-color: #f2f2f2;
+    width:700px;
+    padding: 8px;
+}
+
+#content { 
+  margin-top: 40px; 
+  margin-left:auto;
+  margin-right:auto;
+  width:700px; 
+}
+
+h1 { 
+  font-size: 20px; 
+  line-height: 1.2em; 
+  margin-bottom: 40px; 
+  font-weight: bold;
+}
+h1 span { 
+  font-size: 16px; 
+  color: #888888;
+  font-weight: normal;
+  }
+  
+h1 a { color: #333; text-decoration: none;}
+h1 a:visited { color: #333; text-decoration: none;}
+h1 a:hover { color: #333; text-decoration: underline;}
+
+h2 { 
+  font-size: 16px; font-weight: bold;
+  margin: 10px 0; 
+}
+h3 {
+  font-size:14px;
+  line-height:1.5em;
+  margin: 10px 0; 
+}
+
+div .section { 
+    margin:  0 0 20px 0px; 
+  }
+  
+.blue { 
+  color: #79B9DF;
+}
+
+.yellow {
+  color: #F8D777;
+}
+
+a, a:visited{ 
+  text-decoration: none; color: #2A5DB0;
+}
+a:hover { 
+  text-decoration: underline; color: #2A5DB0;
+}
+
+pre code { 
+  font-family:"Monaco","Consolas","DejaVu Sans Mono",monospace;
+}
+
+div ul, div ol {
+  margin: 0 40px;
+}
+ul li {
+  list-style-type: square;
+}
+
+ol li { list-style-type: decimal; margin-bottom: 10px;}
+
+.notice { 
+  background-color:#FFFECA; 
+  padding: 8px; 
+  margin: -10px 0 20px 0;
+}

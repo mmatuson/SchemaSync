@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <meta name="keywords" content="Python, MySQL, Schema Sync, migrations, schema verioning, open-source" />
+    <meta name="description" content="Schema Sync is a MySQL Schema Versioning and Migration Utility that will generate the SQL necessary to migrate the schema of a source database to a target database (patch script), as well as a the SQL necessary to undo the changes after you apply them (revert script)" />
+    
+    <title>Installation Instructions | Schema Sync</title>
+    <link rel="stylesheet" href="screen.css" media="screen,projection" type="text/css" />
+</head>
+
+<body>
+    <div id="top"></div>
+    <div id="content">
+        <h1>
+        <a href="/">Schema Sync</a>
+        <span>Installation Instructions</span>
+        </h1>
+        
+
+     <h2>Standard Installation</h2>
+     <div class="section">
+     <pre>
+     <code>Download <a href="http://www.schemasync.org/downloads/SchemaSync-0.9.2.tar.gz">SchemaSync-0.9.2</a>
+         
+     tar xvzf SchemaSync-0.9.2.tar.gz
+     cd SchemaSync-0.9.2
+     python setup.py install</code>
+     </pre>
+    </div>
+              
+            <h2>Installing without root access</h2>
+            <div class="section">
+            To install Schema Sync and it's dependancies without root access, we need to create a virtual environment where the app can live. We'll be using <a href="http://pypi.python.org/pypi/virtualenv">virtualenv</a>. virtualenv creates an isolated environment under your account, in the directory of your choice. This new virtual environment cannot interfere with Python programs running elsewhere on the system.
+            
+            <pre>
+            <code>
+                
+            Download <a href="http://bitbucket.org/ianb/virtualenv/get/tip.gz#egg=virtualenv-tip">VirtualEnv</a>
+            tar xvzf virtualenv-tip.gz
+            mv virtualenv/virtualenv.py ./  # we only need the virtualenv.py script
+            rm virtualenv-tip.gz            # cleanup
+            rm -r virtualenv/               # cleanup
+            </code>
+            </pre>
+            
+            <p>Now that we have VirtualEnv, we can create a virtual environment for the application (or multiple applications). For this example, we will setup an environment just for schemasync. You can optionally pass --no-site-packages to virtualenv.py so your virtual environment will not inherit the packages already installed on your system. If MySQLdb is already installed on the system and you pass this option, you will need to re-install it in your environment.</p>
+            <pre>
+            <code>
+            python virtualenv.py schemasync     # optionally pass --no-site-packages
+            source schemasync/bin/activate      # activate the environment
+            mkdir schemasync/src                # create a src dir for any packages we download
+            cd schemasync/src
+            
+            # If you need MySQLdb for this env, install it now
+            
+            # Install schemasync (auto installs schemaobject 0.5.3)
+            Download <a href="http://www.schemasync.org/downloads/SchemaSync-0.9.2.tar.gz">SchemaSync-0.9.2</a>
+            tar xvzf SchemaSync-0.9.2.tar.gz
+            cd SchemaSync-0.9.2
+            python setup.py install
+            
+            # to deactivate this environment, just type deactivate
+            </code>
+            </pre>
+            
+            <b>Notes:</b> Before you can use schemasync, you will need to activate this environment. To uninstall schemasync, just deactivate the environment and remove the schemasync env directory we created. You can find more info on using virtualenv <a href="http://rhodesmill.org/brandon/2009/emacs-python-virtualenv/">here</a> and <a href="http://arthurkoziel.com/2008/10/22/working-virtualenv/">here</a>.
+            </div>
+            <br/><br/>
+            
+            
+            <h2>Installing the latest development version</h2>
+            <div class="section">
+            <pre>
+            <code>git clone git://github.com/mmatuson/SchemaSync.git
+            cd SchemaSync
+            sudo python setup.py install</code>
+            </pre>
+            </div>
+                   
+                   
+            <h2>Upgrading Schema Sync</h2>
+            <div class="section">
+            If you installed Schema Sync using setup.py install, you can upgrade Schema Sync by deleting the schemasync directory from your Python site-packages (or virtualenv) and re-installing the new version. 
+            <br/><br/>
+             <b>Where are my site-packages stored?</b>
+             <br/>
+             The location of the site-packages directory depends on the operating system, and the location in which Python was installed. To find out your system’s site-packages location, execute the following:
+
+                 <pre>
+                 <code>
+python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()"
+                 </code></pre>
+
+                 Note that this should be run from a shell prompt, not a Python interactive prompt. 
+                 <br/>
+                 Thanks to <a target="_blank"  href="http://docs.djangoproject.com/en/dev/topics/install/#remove-any-old-versions-of-django">the Django install page</a> for these helpful instructions.
+            
+                     
+        </div>
+
+
+        
+    </div>
+    
+    <div id="footer">
+    &copy; Copyright 2010, <a rel="author" href="http://www.matuson.com">Mitch Matuson</a>
+    </div>
+    
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+    var pageTracker = _gat._getTracker("UA-11534281-1");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+</body>
+
+</html>

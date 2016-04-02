@@ -1,0 +1,71 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <meta name="keywords" content="Python, MySQL, Schema Sync, migrations, schema verioning, open-source" />
+    <meta name="description" content="Schema Sync is a MySQL Schema Versioning and Migration Utility that will generate the SQL necessary to migrate the schema of a source database to a target database (patch script), as well as a the SQL necessary to undo the changes after you apply them (revert script)" />
+    
+    <title>Status Updates | Schema Sync</title>
+    <link rel="stylesheet" href="screen.css" media="screen,projection" type="text/css" />
+</head>
+
+<body>
+    <div id="top"></div>
+    <div id="content">
+        <h1>
+        <a href="/">Schema Sync</a>
+        <span>Status Updates</span>
+        </h1>
+        
+    <a name="2010-12-05"></a>
+        <h2>0.9.2 / 2010-12-05</h2>
+         <div class="section">
+         <b>This update fixes the following:</b>
+         <ul>
+            <li>Added MANIFEST.in so ez_setup.py is included for users without setuptools.</li>
+        </ul>
+       </div>
+            
+    <a name="2010-02-16"></a>
+     <h2>0.9.1 / 2010-02-16</h2>
+      <div class="section">
+      <b>This update fixes the following:</b>
+      <ul>
+         <li>Table/Column COMMENT and AUTO_INCREMENT can now be stripped without corrupting the CREATE TABLE statement (bug occurred when the table definition had multiple column comments or a single column comment followed by a column with a string as its default value)</li>
+         <li>Column sync now checks for modifications in ALL Columns, even if they are in the correct sequence</li>
+     </ul>
+    </div>
+         
+     <a name="2009-12-02"></a>
+     <h2>0.9.0 / 2009-12-02</h2>
+     <div class="section">
+      The minimum required version for the dependancy SchemaObject has been changed to 0.5.2. This release contains important bug fixes that affect Schema Sync. Existing Schema Sync users should <a href="http://matuson.com/code/schemaobject/upgrading.html">upgrade SchemaObject</a> Immediately.
+    <br/><br/>
+     <b>This update fixes the following:</b>
+     <ul>
+         <li>Column DEFAULT is now quoted for all non numeric and reserved values</li>
+         <li>CHARACTER SET &amp; COLLATE are now omitted from the Column definition if they are the same as the parent Table. This will prevent the app from overriding the Table defaults.</li>
+         <li>Column definition syntax bug fixed. CHARACTER SET &amp; COLLATE were in the wrong spot, creating an invalid syntax error in the SQL</li>
+     </ul>
+    </div>
+    
+        
+    </div>
+    
+    <div id="footer">
+    &copy; Copyright 2010, <a rel="author" href="http://www.matuson.com">Mitch Matuson</a>
+    </div>
+    
+    <script type="text/javascript">
+    var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+    document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+    try {
+    var pageTracker = _gat._getTracker("UA-11534281-1");
+    pageTracker._trackPageview();
+    } catch(err) {}</script>
+</body>
+
+</html>
