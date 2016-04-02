@@ -6,8 +6,8 @@
     <meta name="keywords" content="Python, MySQL, Schema Sync, migrations, schema verioning, open-source" />
     <meta name="description" content="Schema Sync is a MySQL Schema Versioning and Migration Utility that will generate the SQL necessary to migrate the schema of a source database to a target database (patch script), as well as a the SQL necessary to undo the changes after you apply them (revert script)" />
 
-	
-	
+
+
     <title>Schema Sync &#8250; a MySQL Schema Versioning and Migration Utility</title>
     <link rel="stylesheet" href="screen.css" media="screen,projection" type="text/css" />
 </head>
@@ -16,29 +16,29 @@
     <div id="top"></div>
     <div id="content">
         <div class="notice" style="display: none;"></div>
-            
+
         <h1>
         Schema Sync
         <span>a MySQL Schema Versioning and Migration Utility</span>
         </h1>
-        
+
         <h2>Synopsis</h2>
         <div class="section">
             <pre>
                 <code>schemasync [options] &lt;source&gt; &lt;target&gt;
-                    
+
                 # source/target format: mysql://user:pass@host:port/database
                 # output format: &lt;database&gt;[_&lt;tag&gt;].YYYYMMDD.(patch|revert)[_&lt;version&gt;].sql</code>
             </pre>
         </div>
-        
+
         <h2>Description</h2>
         <div class="section">
             <p>
             Schema Sync will generate the SQL necessary to migrate the schema of a source database to a target database (patch script), as well as a the SQL necessary to undo the changes after you apply them (revert script).
             </p>
         </div>
-        
+
         <div class="section">
             <ul>
                 <li>Schema Sync does not alter your database. It only generates the .sql files containing the differences. You must apply the changes.</li>
@@ -48,7 +48,7 @@
                 <li><a href="http://dev.mysql.com/doc/refman/5.1/en/partitioning.html">Partitions</a> (MySQL 5.1+) are not yet supported
             </ul>
         </div>
-        
+
         <h2>Examples</h2>
         <div class="section">
         <ol>
@@ -73,11 +73,11 @@
 </pre>
         </li>
 
-                
-                
+
+
         </ol>
         </div>
-        
+
         <h2>Options</h2>
         <div class="section">
             <pre><code>
@@ -99,7 +99,7 @@
                                 Default is output directory.
                                 Log filename is schemasync.log</code></pre>
         </div>
-        
+
        <h2>Download &amp; Install</h2>
        <div class="section">
            <h3>Prerequisites</h3>
@@ -113,16 +113,16 @@
              <p>
                  To run the test suite, you will need to install the <a href="http://dev.mysql.com/doc/sakila/en/sakila.html">Sakila Database</a>, version 0.8<br/>
              </p>
-             
+
              <h3>Installation</h3>
              <pre>
              <code>Download <a href="http://www.schemasync.org/downloads/SchemaSync-0.9.2.tar.gz">SchemaSync-0.9.2</a>
-                 
+
              tar xvzf SchemaSync-0.9.2.tar.gz
              cd SchemaSync-0.9.2
              sudo python setup.py install</code>
              </pre>
-            
+
             <p>
                 To install without root access or install the latest development version, see <a href="install.htm">Installation Instructions</a>.
             </p>
@@ -134,25 +134,24 @@
             <a rel="author" href="http://www.matuson.com">Mitch Matuson</a> &lt;code at matuson com&gt;
             </p>
         </div>
-        
+
         <h2>Status &amp; License</h2>
         <div class="section">
             <p>
-            Schema Sync is under active development and released under the <a rel="license" href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>. <br />
-            You can follow important notices and updates to Schema Sync on the <a href="updates.htm">Updates page</a>.<br/>
+            Schema Sync is no longer maintained.
+            It is released under the <a rel="license" href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>. <br />
             You can obtain a copy of the latest source code from the <a href="http://github.com/mmatuson/SchemaSync">Git repository</a>, or fork it on <a href="http://www.github.com">Github</a>.<br />
             You can report bugs via the <a href="http://github.com/mmatuson/SchemaSync/issues">Schema Sync Issues page</a><br />
-            Comments, questions, and feature requests can be sent to <i>code at matuson com</i><br />
             Thanks to <a href="http://ronaldbradford.com/" target="_blank">Ronald Bradford</a> for feedback on the design of Schema Sync
             </p>
         </div>
-        
+
     </div>
-    
+
     <div id="footer">
     &copy; Copyright 2010, <a rel="author" href="http://www.matuson.com">Mitch Matuson</a>
     </div>
-    
+
     <script type="text/javascript">
     var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
     document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
