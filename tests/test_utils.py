@@ -3,7 +3,7 @@ import unittest
 import os
 import glob
 import datetime
-from schemasync.utils import versioned, create_pnames, PatchBuffer
+from schemasync.utils import versioned, create_pnames, compare_version, PatchBuffer
 
 
 class TestVersioned(unittest.TestCase):
@@ -82,6 +82,13 @@ class TestPNames(unittest.TestCase):
         r = "mydb_my-tag_123.%s.revert.sql" % d
         self.assertEqual((p,r), create_pnames("mydb",tag="my-tag_123", date_format="%Y%m%d"))
 
+class TestCompareVersion(unittest.TestCase):
+    def test_basic_compare(self):
+        self.assertTrue(compare_version('10.0.0-mysql', '5.0.0-mysql') > 0)
+        self.assertTrue(compare_version('10.0.0-mysql', '5.0.0-log') > 0)
+        self.assertTrue(compare_version('5.1.0-mysql', '5.0.1-log') > 0)
+        self.assertTrue(compare_version('5.0.0-mysql', '5.0.0-log') == 0)
+        self.assertTrue(compare_version('5.0.0-mysql', '5.0.1-log') < 0)
 
 class TestPatchBuffer(unittest.TestCase):
 
