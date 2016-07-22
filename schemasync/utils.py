@@ -13,6 +13,7 @@ REGEX_DISTANT_SEMICOLIN = re.compile(r'(\s+;)$')
 REGEX_FILE_COUNTER = re.compile(r"\_(?P<i>[0-9]+)\.(?:[^\.]+)$")
 REGEX_TABLE_COMMENT = re.compile(r"COMMENT(?:(?:\s*=\s*)|\s*)'(.*?)'", re.I)
 REGEX_TABLE_AUTO_INC = re.compile(r"AUTO_INCREMENT(?:(?:\s*=\s*)|\s*)(\d+)", re.I)
+REGEX_SEMICOLON_EXPLODE_TO_NEWLINE = re.compile(r';\s+')
 
 
 def versioned(filename):

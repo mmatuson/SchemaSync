@@ -201,7 +201,8 @@ def app(sourcedb='', targetdb='', version_filename=False,
 
     # data transformation filters
     filters = (lambda d: utils.REGEX_MULTI_SPACE.sub(' ', d),
-                lambda d: utils.REGEX_DISTANT_SEMICOLIN.sub(';', d))
+                lambda d: utils.REGEX_DISTANT_SEMICOLIN.sub(';', d),
+                lambda d: utils.REGEX_SEMICOLON_EXPLODE_TO_NEWLINE.sub(";\n", d))
 
     # Information about this run, used in the patch/revert templates
     ctx = dict(app_version=APPLICATION_VERSION,
