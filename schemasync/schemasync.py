@@ -189,12 +189,12 @@ def app(sourcedb='', targetdb='', version_filename=False,
     source_obj = schemaobject.SchemaObject(sourcedb)
     target_obj = schemaobject.SchemaObject(targetdb)
 
-    if source_obj.version < '5.0.0':
+    if utils.compare_version(source_obj.version, '5.0.0') < 0:
         logging.error("%s requires MySQL version 5.0+ (source is v%s)"
                         % (APPLICATION_NAME, source_obj.version))
         return 1
 
-    if target_obj.version < '5.0.0':
+    if  utils.compare_version(target_obj.version, '5.0.0') < 0:
         logging.error("%s requires MySQL version 5.0+ (target is v%s)"
                 % (APPLICATION_NAME, target_obj.version))
         return 1
