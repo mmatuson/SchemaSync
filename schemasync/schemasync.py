@@ -66,11 +66,11 @@ def parse_cmd_line(fn):
                           help=("show version and exit."))
 
         parser.add_option("-r", "--revision",
-                        action="store_true",
-                        dest="version_filename",
-                        default=False,
-                        help=("increment the migration script version number "
-                              "if a file with the same name already exists."))
+                          action="store_true",
+                          dest="version_filename",
+                          default=False,
+                          help=("increment the migration script version number "
+                                "if a file with the same name already exists."))
 
         parser.add_option("-a", "--sync-auto-inc",
                           dest="sync_auto_inc",
@@ -85,17 +85,28 @@ def parse_cmd_line(fn):
                           help=("sync the COMMENT field for all "
                                 "tables AND columns"))
 
+        parser.add_option("-D", "--no-date",
+                          dest="no_date",
+                          action="store_true",
+                          default=False,
+                          help=("removes the date from the file format "))
+
+        parser.add_option("--charset",
+                          dest="charset",
+                          default='utf8',
+                          help=("set the connection charset, default: utf8"))
+
         parser.add_option("--tag",
-                         dest="tag",
-                         help=("tag the migration scripts as <database>_<tag>."
-                               " Valid characters include [A-Za-z0-9-_]"))
+                          dest="tag",
+                          help=("tag the migration scripts as <database>_<tag>."
+                                " Valid characters include [A-Za-z0-9-_]"))
 
         parser.add_option("--output-directory",
                           dest="output_directory",
                           default=os.getcwd(),
                           help=("directory to write the migration scrips. "
-                                 "The default is current working directory. "
-                                 "Must use absolute path if provided."))
+                                "The default is current working directory. "
+                                "Must use absolute path if provided."))
 
         parser.add_option("--log-directory",
                           dest="log_directory",
@@ -118,15 +129,17 @@ def parse_cmd_line(fn):
         return fn(*args, **dict(version_filename=options.version_filename,
                                  output_directory=options.output_directory,
                                  log_directory=options.log_directory,
+                                 no_date=options.no_date,
                                  tag=options.tag,
+                                 charset=options.charset,
                                  sync_auto_inc=options.sync_auto_inc,
                                  sync_comments=options.sync_comments))
     return processor
 
 
 def app(sourcedb='', targetdb='', version_filename=False,
-        output_directory=None, log_directory=None,
-        tag=None, sync_auto_inc=False, sync_comments=False):
+        output_directory=None, log_directory=None, no_date=False,
+        tag=None, charset=None, sync_auto_inc=False, sync_comments=False):
     """Main Application"""
 
     options = locals()
@@ -146,7 +159,7 @@ def app(sourcedb='', targetdb='', version_filename=False,
 
     logging.basicConfig(filename=os.path.join(log_directory, LOG_FILENAME),
                         level=logging.INFO,
-                        format= '[%(levelname)s  %(asctime)s] %(message)s')
+                        format='[%(levelname)s  %(asctime)s] %(message)s')
 
     console = logging.StreamHandler()
     console.setLevel(logging.DEBUG)
@@ -186,22 +199,23 @@ def app(sourcedb='', targetdb='', version_filename=False,
         logging.error("Target database name not provided. Exiting.")
         return 1
 
-    source_obj = schemaobject.SchemaObject(sourcedb)
-    target_obj = schemaobject.SchemaObject(targetdb)
+    source_obj = schemaobject.SchemaObject(sourcedb, charset)
+    target_obj = schemaobject.SchemaObject(targetdb, charset)
 
     if utils.compare_version(source_obj.version, '5.0.0') < 0:
         logging.error("%s requires MySQL version 5.0+ (source is v%s)"
-                        % (APPLICATION_NAME, source_obj.version))
+                      % (APPLICATION_NAME, source_obj.version))
         return 1
 
-    if  utils.compare_version(target_obj.version, '5.0.0') < 0:
+    if utils.compare_version(target_obj.version, '5.0.0') < 0:
         logging.error("%s requires MySQL version 5.0+ (target is v%s)"
-                % (APPLICATION_NAME, target_obj.version))
+                      % (APPLICATION_NAME, target_obj.version))
         return 1
 
     # data transformation filters
     filters = (lambda d: utils.REGEX_MULTI_SPACE.sub(' ', d),
-                lambda d: utils.REGEX_DISTANT_SEMICOLIN.sub(';', d))
+               lambda d: utils.REGEX_DISTANT_SEMICOLIN.sub(';', d),
+               lambda d: utils.REGEX_SEMICOLON_EXPLODE_TO_NEWLINE.sub(";\n", d))
 
     # Information about this run, used in the patch/revert templates
     ctx = dict(app_version=APPLICATION_VERSION,
@@ -210,9 +224,10 @@ def app(sourcedb='', targetdb='', version_filename=False,
                target_database=target_obj.selected.name,
                created=datetime.datetime.now().strftime(TPL_DATE_FORMAT))
 
-    p_fname, r_fname = utils.create_pnames(target_obj.selected.name, 
+    p_fname, r_fname = utils.create_pnames(target_obj.selected.name,
                                            tag=tag,
-                                           date_format=DATE_FORMAT)
+                                           date_format=DATE_FORMAT,
+                                           no_date=no_date)
 
     ctx['type'] = "Patch Script"
     pBuffer = utils.PatchBuffer(name=os.path.join(output_directory, p_fname),
@@ -228,7 +243,79 @@ def app(sourcedb='', targetdb='', version_filename=False,
     for patch, revert in syncdb.sync_schema(source_obj.selected,
                                             target_obj.selected, options):
         if patch and revert:
+            if not db_selected:
+                pBuffer.write(target_obj.selected.select() + '\n')
+                rBuffer.write(target_obj.selected.select() + '\n')
+                pBuffer.write(target_obj.selected.fk_checks(0) + '\n')
+                rBuffer.write(target_obj.selected.fk_checks(0) + '\n')
+                db_selected = True
 
+            pBuffer.write(patch + '\n')
+            rBuffer.write(revert + '\n')
+
+    if db_selected:
+        pBuffer.write(target_obj.selected.fk_checks(1) + '\n')
+        rBuffer.write(target_obj.selected.fk_checks(1) + '\n')
+
+    for patch, revert in syncdb.sync_views(source_obj.selected, target_obj.selected):
+        if patch and revert:
+            if not db_selected:
+                pBuffer.write(target_obj.selected.select() + '\n')
+                rBuffer.write(target_obj.selected.select() + '\n')
+                db_selected = True
+
+            pBuffer.write(patch + '\n')
+            rBuffer.write(revert + '\n')
+
+    for patch, revert in syncdb.sync_triggers(source_obj.selected, target_obj.selected):
+        if patch and revert:
+            if not db_selected:
+                pBuffer.write(target_obj.selected.select() + '\n')
+                rBuffer.write(target_obj.selected.select() + '\n')
+                db_selected = True
+
+            pBuffer.write(patch + '\n')
+            rBuffer.write(revert + '\n')
+
+    for patch, revert in syncdb.sync_procedures(source_obj.selected, target_obj.selected):
+        if patch and revert:
+
+            if not db_selected:
+                pBuffer.write(target_obj.selected.select() + '\n')
+                rBuffer.write(target_obj.selected.select() + '\n')
+                pBuffer.write(target_obj.selected.fk_checks(0) + '\n')
+                rBuffer.write(target_obj.selected.fk_checks(0) + '\n')
+                db_selected = True
+
+            pBuffer.write(patch + '\n')
+            rBuffer.write(revert + '\n')
+
+    if db_selected:
+        pBuffer.write(target_obj.selected.fk_checks(1) + '\n')
+        rBuffer.write(target_obj.selected.fk_checks(1) + '\n')
+
+    for patch, revert in syncdb.sync_views(source_obj.selected, target_obj.selected):
+        if patch and revert:
+            if not db_selected:
+                pBuffer.write(target_obj.selected.select() + '\n')
+                rBuffer.write(target_obj.selected.select() + '\n')
+                db_selected = True
+
+            pBuffer.write(patch + '\n')
+            rBuffer.write(revert + '\n')
+
+    for patch, revert in syncdb.sync_triggers(source_obj.selected, target_obj.selected):
+        if patch and revert:
+            if not db_selected:
+                pBuffer.write(target_obj.selected.select() + '\n')
+                rBuffer.write(target_obj.selected.select() + '\n')
+                db_selected = True
+
+            pBuffer.write(patch + '\n')
+            rBuffer.write(revert + '\n')
+
+    for patch, revert in syncdb.sync_procedures(source_obj.selected, target_obj.selected):
+        if patch and revert:
             if not db_selected:
                 pBuffer.write(target_obj.selected.select() + '\n')
                 rBuffer.write(target_obj.selected.select() + '\n')
@@ -239,9 +326,9 @@ def app(sourcedb='', targetdb='', version_filename=False,
 
     if not pBuffer.modified:
         logging.info(("No migration scripts written."
-                     " mysql://%s/%s and mysql://%s/%s were in sync.") %
-                    (source_obj.host, source_obj.selected.name,
-                     target_obj.host, target_obj.selected.name))
+                      " mysql://%s/%s and mysql://%s/%s were in sync.") %
+                     (source_obj.host, source_obj.selected.name,
+                      target_obj.host, target_obj.selected.name))
     else:
         try:
             pBuffer.save()
