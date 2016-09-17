@@ -23,14 +23,14 @@ def sync_schema(fromdb, todb, options):
                "%s %s;" % (todb.alter(), r))
 
     for p, r in sync_created_tables(fromdb.tables, todb.tables,
-                                   sync_auto_inc=options['sync_auto_inc'],
-                                   sync_comments=options['sync_comments']):
+                                    sync_auto_inc=options['sync_auto_inc'],
+                                    sync_comments=options['sync_comments']):
         yield p, r
 
     for p, r in sync_dropped_tables(fromdb.tables, todb.tables,
                                     sync_auto_inc=options['sync_auto_inc'],
                                     sync_comments=options['sync_comments']):
-        yield  p, r
+        yield p, r
 
     for t in fromdb.tables:
         if not t in todb.tables:
@@ -55,6 +55,17 @@ def sync_schema(fromdb, todb, options):
                 r.append("%s %s;" % (to_table.alter(), eachr))
 
             yield '\n'.join(p), '\n'.join(r)
+            p = []
+            for eachp in plist:
+                p.append("%s %s;" % (to_table.alter(), eachp))
+
+            r = []
+            for eachr in rlist:
+                r.append("%s %s;" % (to_table.alter(), eachr))
+
+            yield '\n'.join(p), '\n'.join(r)
+
+        yield p, r
 
 
 def sync_table(from_table, to_table, options):
@@ -77,8 +88,8 @@ def sync_table(from_table, to_table, options):
         yield (p, r)
 
     for p, r in sync_dropped_columns(from_table.columns,
-                                    to_table.columns,
-                                    sync_comments=options['sync_comments']):
+                                     to_table.columns,
+                                     sync_comments=options['sync_comments']):
         yield (p, r)
 
     if from_table and to_table:
@@ -109,14 +120,14 @@ def sync_table(from_table, to_table, options):
                                              to_table.foreign_keys):
             yield (p, r)
 
-        #drop remaining indexes
+        # drop remaining indexes
         for p, r in sync_dropped_constraints(from_table.indexes, to_table.indexes):
             yield (p, r)
 
         # end the alter table syntax with the changed table options
         p, r = sync_table_options(from_table, to_table,
-                                 sync_auto_inc=options['sync_auto_inc'],
-                                 sync_comments=options['sync_comments'])
+                                  sync_auto_inc=options['sync_auto_inc'],
+                                  sync_comments=options['sync_comments'])
         if p:
             yield (p, r)
 
@@ -226,7 +237,7 @@ def sync_table_options(from_table, to_table,
 
     for opt in from_table.options:
         if ((opt == 'auto_increment' and not sync_auto_inc) or
-            (opt == 'comment' and not sync_comments)):
+                (opt == 'comment' and not sync_comments)):
             continue
 
         if from_table.options[opt] != to_table.options[opt]:
@@ -319,8 +330,8 @@ def sync_modified_columns(from_cols, to_cols, sync_comments=False):
         to_idx = to_names.index(name)
 
         if ((from_idx != to_idx) or
-            (to_cols[name] != from_cols[name]) or
-            (sync_comments and (from_cols[name].comment != to_cols[name].comment))):
+                (to_cols[name] != from_cols[name]) or
+                (sync_comments and (from_cols[name].comment != to_cols[name].comment))):
 
             # move the element to its correct spot as we do comparisons
             # this will prevent a domino effect of off-by-one false positives.
@@ -477,6 +488,104 @@ def sync_dropped_triggers(src, dest):
     for t in dest:
         if t not in src:
             yield dest[t].drop(), dest[t].create()
+
+def sync_modified_triggers(src, dest):
+    for t in src:
+        if t in dest and src[t] != dest[t]:
+            yield dest[t].drop(), dest[t].create()
+            yield src[t].create(), src[t].drop()
+
+
+def sync_views(fromdb, todb):
+    src = fromdb.views
+    dest = todb.views
+
+    for p, r in sync_created_views(src, dest):
+        yield p, r
+
+    for p, r in sync_dropped_views(src, dest):
+        yield p, r
+
+    for p, r in sync_modified_views(src, dest):
+        yield p, r
+
+
+def sync_created_views(src, dest):
+    for v in src:
+        if v not in dest:
+            yield src[v].create(), src[v].drop()
+
+
+def sync_dropped_views(src, dest):
+    for v in dest:
+        if v not in src:
+            yield dest[v].drop(), dest[v].create()
+
+
+def sync_modified_views(src, dest):
+    for v in src:
+        if v in dest and src[v] != dest[v]:
+            yield src[v].modify(), dest[v].modify()
+
+
+def sync_procedures(fromdb, todb):
+    src = fromdb.procedures
+    dest = todb.procedures
+
+    for p, r in sync_created_procedures(src, dest):
+        yield p, r
+
+    for p, r in sync_dropped_procedures(src, dest):
+        yield p, r
+
+    for p, r in sync_modified_procedures(src, dest):
+        yield p, r
+
+
+def sync_created_procedures(src, dest):
+    for p in src:
+        if p not in dest:
+            yield src[p].create(), src[p].drop()
+
+
+def sync_dropped_procedures(src, dest):
+    for p in dest:
+        if p not in src:
+            yield dest[p].drop(), src[p].create()
+
+
+def sync_modified_procedures(src, dest):
+    for p in src:
+        if p in dest and src[p] != dest[p]:
+            yield dest[p].drop(), dest[p].create()  # Drop
+            yield src[p].create(), src[p].drop()  # Re-add
+
+
+def sync_triggers(fromdb, todb):
+    src = fromdb.triggers
+    dest = todb.triggers
+
+    for p, r in sync_created_triggers(src, dest):
+        yield p, r
+
+    for p, r in sync_dropped_triggers(src, dest):
+        yield p, r
+
+    for p, r in sync_modified_triggers(src, dest):
+        yield p, r
+
+
+def sync_created_triggers(src, dest):
+    for t in src:
+        if t not in dest:
+            yield src[t].create(), src[t].drop()
+
+
+def sync_dropped_triggers(src, dest):
+    for t in dest:
+        if t not in src:
+            yield dest[t].drop(), dest[t].create()
+
 
 def sync_modified_triggers(src, dest):
     for t in src:

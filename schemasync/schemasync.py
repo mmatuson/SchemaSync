@@ -30,7 +30,6 @@ except ImportError:
     print "Error: Missing Required Dependency SchemaObject"
     sys.exit(1)
 
-
 APPLICATION_VERSION = __version__
 APPLICATION_NAME = "Schema Sync"
 LOG_FILENAME = "schemasync.log"
@@ -57,7 +56,7 @@ def parse_cmd_line(fn):
                        A MySQL Schema Synchronization Utility
                       """
         parser = optparse.OptionParser(usage=usage,
-                                        description=description)
+                                       description=description)
 
         parser.add_option("-V", "--version",
                           action="store_true",
@@ -66,11 +65,11 @@ def parse_cmd_line(fn):
                           help=("show version and exit."))
 
         parser.add_option("-r", "--revision",
-                        action="store_true",
-                        dest="version_filename",
-                        default=False,
-                        help=("increment the migration script version number "
-                              "if a file with the same name already exists."))
+                          action="store_true",
+                          dest="version_filename",
+                          default=False,
+                          help=("increment the migration script version number "
+                                "if a file with the same name already exists."))
 
         parser.add_option("-a", "--sync-auto-inc",
                           dest="sync_auto_inc",
@@ -86,16 +85,16 @@ def parse_cmd_line(fn):
                                 "tables AND columns"))
 
         parser.add_option("--tag",
-                         dest="tag",
-                         help=("tag the migration scripts as <database>_<tag>."
-                               " Valid characters include [A-Za-z0-9-_]"))
+                          dest="tag",
+                          help=("tag the migration scripts as <database>_<tag>."
+                                " Valid characters include [A-Za-z0-9-_]"))
 
         parser.add_option("--output-directory",
                           dest="output_directory",
                           default=os.getcwd(),
                           help=("directory to write the migration scrips. "
-                                 "The default is current working directory. "
-                                 "Must use absolute path if provided."))
+                                "The default is current working directory. "
+                                "Must use absolute path if provided."))
 
         parser.add_option("--log-directory",
                           dest="log_directory",
@@ -106,7 +105,6 @@ def parse_cmd_line(fn):
 
         options, args = parser.parse_args(sys.argv[1:])
 
-
         if options.show_version:
             print APPLICATION_NAME, __version__
             return 0
@@ -116,11 +114,12 @@ def parse_cmd_line(fn):
             return 0
 
         return fn(*args, **dict(version_filename=options.version_filename,
-                                 output_directory=options.output_directory,
-                                 log_directory=options.log_directory,
-                                 tag=options.tag,
-                                 sync_auto_inc=options.sync_auto_inc,
-                                 sync_comments=options.sync_comments))
+                                output_directory=options.output_directory,
+                                log_directory=options.log_directory,
+                                tag=options.tag,
+                                sync_auto_inc=options.sync_auto_inc,
+                                sync_comments=options.sync_comments))
+
     return processor
 
 
@@ -146,7 +145,7 @@ def app(sourcedb='', targetdb='', version_filename=False,
 
     logging.basicConfig(filename=os.path.join(log_directory, LOG_FILENAME),
                         level=logging.INFO,
-                        format= '[%(levelname)s  %(asctime)s] %(message)s')
+                        format='[%(levelname)s  %(asctime)s] %(message)s')
 
     console = logging.StreamHandler()
     console.setLevel(logging.DEBUG)
@@ -189,19 +188,20 @@ def app(sourcedb='', targetdb='', version_filename=False,
     source_obj = schemaobject.SchemaObject(sourcedb)
     target_obj = schemaobject.SchemaObject(targetdb)
 
-    if source_obj.version < '5.0.0':
+    if utils.compare_version(source_obj.version, '5.0.0') < 0:
         logging.error("%s requires MySQL version 5.0+ (source is v%s)"
-                        % (APPLICATION_NAME, source_obj.version))
+                      % (APPLICATION_NAME, source_obj.version))
         return 1
 
-    if target_obj.version < '5.0.0':
+    if utils.compare_version(target_obj.version, '5.0.0') < 0:
         logging.error("%s requires MySQL version 5.0+ (target is v%s)"
-                % (APPLICATION_NAME, target_obj.version))
+                      % (APPLICATION_NAME, target_obj.version))
         return 1
 
     # data transformation filters
     filters = (lambda d: utils.REGEX_MULTI_SPACE.sub(' ', d),
-                lambda d: utils.REGEX_DISTANT_SEMICOLIN.sub(';', d))
+               lambda d: utils.REGEX_DISTANT_SEMICOLIN.sub(';', d),
+               lambda d: utils.REGEX_SEMICOLON_EXPLODE_TO_NEWLINE.sub(";\n", d))
 
     # Information about this run, used in the patch/revert templates
     ctx = dict(app_version=APPLICATION_VERSION,
@@ -210,7 +210,7 @@ def app(sourcedb='', targetdb='', version_filename=False,
                target_database=target_obj.selected.name,
                created=datetime.datetime.now().strftime(TPL_DATE_FORMAT))
 
-    p_fname, r_fname = utils.create_pnames(target_obj.selected.name, 
+    p_fname, r_fname = utils.create_pnames(target_obj.selected.name,
                                            tag=tag,
                                            date_format=DATE_FORMAT)
 
@@ -264,6 +264,43 @@ def app(sourcedb='', targetdb='', version_filename=False,
 
     for patch, revert in syncdb.sync_procedures(source_obj.selected, target_obj.selected):
         if patch and revert:
+
+            if not db_selected:
+                pBuffer.write(target_obj.selected.select() + '\n')
+                rBuffer.write(target_obj.selected.select() + '\n')
+                pBuffer.write(target_obj.selected.fk_checks(0) + '\n')
+                rBuffer.write(target_obj.selected.fk_checks(0) + '\n')
+                db_selected = True
+
+            pBuffer.write(patch + '\n')
+            rBuffer.write(revert + '\n')
+
+    if db_selected:
+        pBuffer.write(target_obj.selected.fk_checks(1) + '\n')
+        rBuffer.write(target_obj.selected.fk_checks(1) + '\n')
+
+    for patch, revert in syncdb.sync_views(source_obj.selected, target_obj.selected):
+        if patch and revert:
+            if not db_selected:
+                pBuffer.write(target_obj.selected.select() + '\n')
+                rBuffer.write(target_obj.selected.select() + '\n')
+                db_selected = True
+
+            pBuffer.write(patch + '\n')
+            rBuffer.write(revert + '\n')
+
+    for patch, revert in syncdb.sync_triggers(source_obj.selected, target_obj.selected):
+        if patch and revert:
+            if not db_selected:
+                pBuffer.write(target_obj.selected.select() + '\n')
+                rBuffer.write(target_obj.selected.select() + '\n')
+                db_selected = True
+
+            pBuffer.write(patch + '\n')
+            rBuffer.write(revert + '\n')
+
+    for patch, revert in syncdb.sync_procedures(source_obj.selected, target_obj.selected):
+        if patch and revert:
             if not db_selected:
                 pBuffer.write(target_obj.selected.select() + '\n')
                 rBuffer.write(target_obj.selected.select() + '\n')
@@ -274,9 +311,9 @@ def app(sourcedb='', targetdb='', version_filename=False,
 
     if not pBuffer.modified:
         logging.info(("No migration scripts written."
-                     " mysql://%s/%s and mysql://%s/%s were in sync.") %
-                    (source_obj.host, source_obj.selected.name,
-                     target_obj.host, target_obj.selected.name))
+                      " mysql://%s/%s and mysql://%s/%s were in sync.") %
+                     (source_obj.host, source_obj.selected.name,
+                      target_obj.host, target_obj.selected.name))
     else:
         try:
             pBuffer.save()
