@@ -5,3 +5,4 @@ docs/
 *.pyc
 .* # Ignore all dotfiles...
 !.gitignore # except for .gitignore
+.idea
