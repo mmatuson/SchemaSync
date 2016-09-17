@@ -13,6 +13,7 @@ REGEX_DISTANT_SEMICOLIN = re.compile(r'(\s+;)$')
 REGEX_FILE_COUNTER = re.compile(r"\_(?P<i>[0-9]+)\.(?:[^\.]+)$")
 REGEX_TABLE_COMMENT = re.compile(r"COMMENT(?:(?:\s*=\s*)|\s*)'(.*?)'", re.I)
 REGEX_TABLE_AUTO_INC = re.compile(r"AUTO_INCREMENT(?:(?:\s*=\s*)|\s*)(\d+)", re.I)
+REGEX_SEMICOLON_EXPLODE_TO_NEWLINE = re.compile(r';\s+')
 
 
 def versioned(filename):
@@ -43,12 +44,12 @@ def versioned(filename):
     return name + ('_%d' % i) + ext
 
 
-def create_pnames(db, tag=None, date_format="%Y%m%d"):
+def create_pnames(db, tag=None, date_format="%Y%m%d", no_date=False):
     """Returns a tuple of the filenames to use to create the migration scripts.
        Filename format: <db>[_<tag>].<date=DATE_FORMAT>.(patch|revert).sql
 
         Args:
-            db: srting, databse name
+            db: string, database name
             tag: string, optional, tag for the filenames
             date_format: string, the current date format
                          Default Format: 21092009
@@ -60,12 +61,33 @@ def create_pnames(db, tag=None, date_format="%Y%m%d"):
     if tag:
         tag = re.sub('[^A-Za-z0-9_-]', '', tag)
         basename = "%s_%s.%s" % (db, tag, d)
+    elif no_date:
+        basename = "%s" % (db)
     else:
         basename = "%s.%s" % (db, d)
 
     return ("%s.%s" % (basename, "patch.sql"),
             "%s.%s" % (basename, "revert.sql"))
 
+def compare_version(x, y, separator = r'[.-]'):
+    """Return negative if version x<y, zero if x==y, positive if x>y.
+
+        Args:
+            x: string, version x to compare
+            y: string, version y to compare
+
+        Returns:
+            integer representing the compare result of version x and y.
+    """
+    x_array = re.split(separator, x)
+    y_array = re.split(separator, y)
+    for index in range(min(len(x_array),len(y_array))):
+        if x_array[index] != y_array[index]:
+            try:
+                return cmp(int(x_array[index]), int(y_array[index]))
+            except ValueError:
+                return 0
+    return 0
 
 class PatchBuffer(object):
     """Class for creating patch files
