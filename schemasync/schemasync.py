@@ -30,6 +30,7 @@ except ImportError:
     print "Error: Missing Required Dependency SchemaObject"
     sys.exit(1)
 
+
 APPLICATION_VERSION = __version__
 APPLICATION_NAME = "Schema Sync"
 LOG_FILENAME = "schemasync.log"
@@ -56,7 +57,7 @@ def parse_cmd_line(fn):
                        A MySQL Schema Synchronization Utility
                       """
         parser = optparse.OptionParser(usage=usage,
-                                       description=description)
+                                        description=description)
 
         parser.add_option("-V", "--version",
                           action="store_true",
@@ -84,6 +85,11 @@ def parse_cmd_line(fn):
                           help=("sync the COMMENT field for all "
                                 "tables AND columns"))
 
+        parser.add_option("--charset",
+                          dest="charset",
+                          default='utf8',
+                          help=("set the connection charset, default: utf8"))
+
         parser.add_option("--tag",
                           dest="tag",
                           help=("tag the migration scripts as <database>_<tag>."
@@ -105,6 +111,7 @@ def parse_cmd_line(fn):
 
         options, args = parser.parse_args(sys.argv[1:])
 
+
         if options.show_version:
             print APPLICATION_NAME, __version__
             return 0
@@ -114,18 +121,18 @@ def parse_cmd_line(fn):
             return 0
 
         return fn(*args, **dict(version_filename=options.version_filename,
-                                output_directory=options.output_directory,
-                                log_directory=options.log_directory,
-                                tag=options.tag,
-                                sync_auto_inc=options.sync_auto_inc,
-                                sync_comments=options.sync_comments))
-
+                                 output_directory=options.output_directory,
+                                 log_directory=options.log_directory,
+                                 tag=options.tag,
+                                 charset=options.charset,
+                                 sync_auto_inc=options.sync_auto_inc,
+                                 sync_comments=options.sync_comments))
     return processor
 
 
 def app(sourcedb='', targetdb='', version_filename=False,
         output_directory=None, log_directory=None,
-        tag=None, sync_auto_inc=False, sync_comments=False):
+        tag=None, charset=None, sync_auto_inc=False, sync_comments=False):
     """Main Application"""
 
     options = locals()
@@ -185,8 +192,8 @@ def app(sourcedb='', targetdb='', version_filename=False,
         logging.error("Target database name not provided. Exiting.")
         return 1
 
-    source_obj = schemaobject.SchemaObject(sourcedb)
-    target_obj = schemaobject.SchemaObject(targetdb)
+    source_obj = schemaobject.SchemaObject(sourcedb, charset)
+    target_obj = schemaobject.SchemaObject(targetdb, charset)
 
     if utils.compare_version(source_obj.version, '5.0.0') < 0:
         logging.error("%s requires MySQL version 5.0+ (source is v%s)"
