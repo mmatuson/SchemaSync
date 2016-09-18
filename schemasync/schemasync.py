@@ -2,7 +2,7 @@
 
 __author__ = "Mitch Matuson"
 __copyright__ = "Copyright 2009 Mitch Matuson"
-__version__ = "0.9.1"
+__version__ = "0.9.3"
 __license__ = "Apache 2.0"
 
 import re

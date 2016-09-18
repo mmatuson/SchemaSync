@@ -6,11 +6,11 @@ from setuptools import setup
 
 setup(
     name='SchemaSync',
-    version='0.9.2',
+    version='0.9.3',
     description='A MySQL Schema Synchronization Utility',
     author='Mitch Matuson',
     packages=['schemasync'],
-    install_requires=['SchemaObject >=0.5.3'],
+    install_requires=['SchemaObject >= 0.5.6'],
     entry_points={
         'console_scripts': [
             'schemasync = schemasync.schemasync:main',
