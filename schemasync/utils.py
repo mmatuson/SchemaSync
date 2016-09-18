@@ -6,11 +6,11 @@ import datetime
 import glob
 import cStringIO
 
-#REGEX_NO_TICKS = re.compile('`')
-#REGEX_INT_SIZE = re.compile('int\(\d+\)')
+# REGEX_NO_TICKS = re.compile('`')
+# REGEX_INT_SIZE = re.compile('int\(\d+\)')
 REGEX_MULTI_SPACE = re.compile(r'\s\s+')
 REGEX_DISTANT_SEMICOLIN = re.compile(r'(\s+;)$')
-REGEX_FILE_COUNTER = re.compile(r"\_(?P<i>[0-9]+)\.(?:[^\.]+)$")
+REGEX_FILE_COUNTER = re.compile(r"_(?P<i>[0-9]+)\.(?:[^.]+)$")
 REGEX_TABLE_COMMENT = re.compile(r"COMMENT(?:(?:\s*=\s*)|\s*)'(.*?)'", re.I)
 REGEX_TABLE_AUTO_INC = re.compile(r"AUTO_INCREMENT(?:(?:\s*=\s*)|\s*)(\d+)", re.I)
 REGEX_SEMICOLON_EXPLODE_TO_NEWLINE = re.compile(r';\s+')
@@ -33,7 +33,7 @@ def versioned(filename):
     if not files:
         return filename
 
-    files= map(lambda x: REGEX_FILE_COUNTER.search(x, re.I), files)
+    files = map(lambda x: REGEX_FILE_COUNTER.search(x, re.I), files)
     file_counters = [i.group('i') for i in files if i]
 
     if file_counters:
@@ -53,6 +53,7 @@ def create_pnames(db, tag=None, date_format="%Y%m%d", no_date=False):
             tag: string, optional, tag for the filenames
             date_format: string, the current date format
                          Default Format: 21092009
+            no_date: bool
 
         Returns:
             tuple of strings (patch_filename, revert_filename)
@@ -69,25 +70,28 @@ def create_pnames(db, tag=None, date_format="%Y%m%d", no_date=False):
     return ("%s.%s" % (basename, "patch.sql"),
             "%s.%s" % (basename, "revert.sql"))
 
-def compare_version(x, y, separator = r'[.-]'):
+
+def compare_version(x, y, separator=r'[.-]'):
     """Return negative if version x<y, zero if x==y, positive if x>y.
 
         Args:
             x: string, version x to compare
             y: string, version y to compare
+            separator: regex
 
         Returns:
             integer representing the compare result of version x and y.
     """
     x_array = re.split(separator, x)
     y_array = re.split(separator, y)
-    for index in range(min(len(x_array),len(y_array))):
+    for index in range(min(len(x_array), len(y_array))):
         if x_array[index] != y_array[index]:
             try:
                 return cmp(int(x_array[index]), int(y_array[index]))
             except ValueError:
                 return 0
     return 0
+
 
 class PatchBuffer(object):
     """Class for creating patch files
