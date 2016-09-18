@@ -18,9 +18,12 @@ def sync_schema(fromdb, todb, options):
         even if they are empty.
     """
     p, r = sync_database_options(fromdb, todb)
+
     if p and r:
-        yield ("%s %s;" % (todb.alter(), p),
-               "%s %s;" % (todb.alter(), r))
+        yield (
+            "%s %s;" % (todb.alter(), p),
+            "%s %s;" % (todb.alter(), r)
+        )
 
     for p, r in sync_created_tables(fromdb.tables, todb.tables,
                                     sync_auto_inc=options['sync_auto_inc'],
@@ -33,7 +36,7 @@ def sync_schema(fromdb, todb, options):
         yield p, r
 
     for t in fromdb.tables:
-        if not t in todb.tables:
+        if t not in todb.tables:
             continue
 
         from_table = fromdb.tables[t]
@@ -46,26 +49,9 @@ def sync_schema(fromdb, todb, options):
             rlist.append(r)
 
         if plist and rlist:
-            p = []
-            for eachp in plist:
-                p.append("%s %s;" % (to_table.alter(), eachp))
-
-            r = []
-            for eachr in rlist:
-                r.append("%s %s;" % (to_table.alter(), eachr))
-
-            yield '\n'.join(p), '\n'.join(r)
-            p = []
-            for eachp in plist:
-                p.append("%s %s;" % (to_table.alter(), eachp))
-
-            r = []
-            for eachr in rlist:
-                r.append("%s %s;" % (to_table.alter(), eachr))
-
-            yield '\n'.join(p), '\n'.join(r)
-
-        yield p, r
+            p = "%s %s;" % (to_table.alter(), ', '.join(plist))
+            r = "%s %s;" % (to_table.alter(), ', '.join(rlist))
+            yield p, r
 
 
 def sync_table(from_table, to_table, options):
@@ -108,16 +94,13 @@ def sync_table(from_table, to_table, options):
         # we'll drop indexes after we process foreign keys...
 
         # add new foreign keys and compare existing fks for changes
-        for p, r in sync_created_constraints(from_table.foreign_keys,
-                                             to_table.foreign_keys):
+        for p, r in sync_created_constraints(from_table.foreign_keys, to_table.foreign_keys):
             yield (p, r)
 
-        for p, r in sync_modified_constraints(from_table.foreign_keys,
-                                              to_table.foreign_keys):
+        for p, r in sync_modified_constraints(from_table.foreign_keys, to_table.foreign_keys):
             yield (p, r)
 
-        for p, r in sync_dropped_constraints(from_table.foreign_keys,
-                                             to_table.foreign_keys):
+        for p, r in sync_dropped_constraints(from_table.foreign_keys, to_table.foreign_keys):
             yield (p, r)
 
         # drop remaining indexes
@@ -140,9 +123,6 @@ def sync_database_options(from_db, to_db):
     Args:
         from_db: A SchemaObject DatabaseSchema Instance.
         to_db: A SchemaObject DatabaseSchema Instance.
-        options: dictionary of options to use when syncing schemas
-            sync_auto_inc: Bool, sync auto increment value throughout the table?
-            sync_comments: Bool, sync comment fields trhoughout the table?
 
     Returns:
         A tuple (patch, revert) containing the SQL statements
@@ -152,14 +132,14 @@ def sync_database_options(from_db, to_db):
     r = []
 
     for opt in from_db.options:
-        if from_db.options[opt] != to_db.options[opt]:
+        if from_db.options[opt] is not to_db.options[opt]:
             p.append(from_db.options[opt].create())
             r.append(to_db.options[opt].create())
 
     if p:
-        return (' '.join(p), ' '.join(r))
+        return ' '.join(p), ' '.join(r)
     else:
-        return ('', '')
+        return '', ''
 
 
 def sync_created_tables(from_tables, to_tables,
@@ -236,8 +216,7 @@ def sync_table_options(from_table, to_table,
     r = []
 
     for opt in from_table.options:
-        if ((opt == 'auto_increment' and not sync_auto_inc) or
-                (opt == 'comment' and not sync_comments)):
+        if (opt == 'auto_increment' and not sync_auto_inc) or (opt == 'comment' and not sync_comments):
             continue
 
         if from_table.options[opt] != to_table.options[opt]:
@@ -245,9 +224,9 @@ def sync_table_options(from_table, to_table,
             r.append(to_table.options[opt].create())
 
     if p:
-        return (' '.join(p), ' '.join(r))
+        return ' '.join(p), ' '.join(r)
     else:
-        return ('', '')
+        return '', ''
 
 
 def get_previous_item(lst, item):
@@ -409,6 +388,7 @@ def sync_modified_constraints(src, dest):
             yield dest[c].drop(), dest[c].drop()
             yield src[c].create(), dest[c].create()
 
+
 def sync_views(fromdb, todb):
     src = fromdb.views
     dest = todb.views
@@ -422,20 +402,24 @@ def sync_views(fromdb, todb):
     for p, r in sync_modified_views(src, dest):
         yield p, r
 
+
 def sync_created_views(src, dest):
     for v in src:
         if v not in dest:
             yield src[v].create(), src[v].drop()
+
 
 def sync_dropped_views(src, dest):
     for v in dest:
         if v not in src:
             yield dest[v].drop(), dest[v].create()
 
+
 def sync_modified_views(src, dest):
     for v in src:
         if v in dest and src[v] != dest[v]:
             yield src[v].modify(), dest[v].modify()
+
 
 def sync_procedures(fromdb, todb):
     src = fromdb.procedures
@@ -450,21 +434,25 @@ def sync_procedures(fromdb, todb):
     for p, r in sync_modified_procedures(src, dest):
         yield p, r
 
+
 def sync_created_procedures(src, dest):
     for p in src:
         if p not in dest:
             yield src[p].create(), src[p].drop()
+
 
 def sync_dropped_procedures(src, dest):
     for p in dest:
         if p not in src:
             yield dest[p].drop(), src[p].create()
 
+
 def sync_modified_procedures(src, dest):
     for p in src:
         if p in dest and src[p] != dest[p]:
-            yield dest[p].drop(), dest[p].create() # Drop
-            yield src[p].create(), src[p].drop() # Re-add
+            yield dest[p].drop(), dest[p].create()  # Drop
+            yield src[p].create(), src[p].drop()  # Re-add
+
 
 def sync_triggers(fromdb, todb):
     src = fromdb.triggers
@@ -479,19 +467,21 @@ def sync_triggers(fromdb, todb):
     for p, r in sync_modified_triggers(src, dest):
         yield p, r
 
+
 def sync_created_triggers(src, dest):
     for t in src:
         if t not in dest:
             yield src[t].create(), src[t].drop()
+
 
 def sync_dropped_triggers(src, dest):
     for t in dest:
         if t not in src:
             yield dest[t].drop(), dest[t].create()
 
+
 def sync_modified_triggers(src, dest):
     for t in src:
         if t in dest and src[t] != dest[t]:
             yield dest[t].drop(), dest[t].create()
             yield src[t].create(), src[t].drop()
-

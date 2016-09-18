@@ -1,10 +1,5 @@
 #!/usr/bin/python
 
-__author__ = "Mitch Matuson"
-__copyright__ = "Copyright 2009 Mitch Matuson"
-__version__ = "0.9.3"
-__license__ = "Apache 2.0"
-
 import re
 import sys
 import os
@@ -14,6 +9,17 @@ import optparse
 import syncdb
 import utils
 import warnings
+
+__author__ = """
+Mitch Matuson
+Mustafa Ozgur
+"""
+__copyright__ = """
+Copyright 2009-2016 Mitch Matuson
+Copyright 2016 Mustafa Ozgur
+"""
+__version__ = "0.9.4"
+__license__ = "Apache 2.0"
 
 # supress MySQLdb DeprecationWarning in Python 2.6
 warnings.simplefilter("ignore", DeprecationWarning)
@@ -29,7 +35,6 @@ try:
 except ImportError:
     print "Error: Missing Required Dependency SchemaObject"
     sys.exit(1)
-
 
 APPLICATION_VERSION = __version__
 APPLICATION_NAME = "Schema Sync"
@@ -49,7 +54,7 @@ PATCH_TPL = """--
 def parse_cmd_line(fn):
     """Parse the command line options and pass them to the application"""
 
-    def processor(*args, **kwargs):
+    def processor():
         usage = """
                 %prog [options] <source> <target>
                 source/target format: mysql://user:pass@host:port/database"""
@@ -57,13 +62,13 @@ def parse_cmd_line(fn):
                        A MySQL Schema Synchronization Utility
                       """
         parser = optparse.OptionParser(usage=usage,
-                                        description=description)
+                                       description=description)
 
         parser.add_option("-V", "--version",
                           action="store_true",
                           dest="show_version",
                           default=False,
-                          help=("show version and exit."))
+                          help="show version and exit.")
 
         parser.add_option("-r", "--revision",
                           action="store_true",
@@ -89,12 +94,12 @@ def parse_cmd_line(fn):
                           dest="no_date",
                           action="store_true",
                           default=False,
-                          help=("removes the date from the file format "))
+                          help="removes the date from the file format ")
 
         parser.add_option("--charset",
                           dest="charset",
                           default='utf8',
-                          help=("set the connection charset, default: utf8"))
+                          help="set the connection charset, default: utf8")
 
         parser.add_option("--tag",
                           dest="tag",
@@ -117,7 +122,6 @@ def parse_cmd_line(fn):
 
         options, args = parser.parse_args(sys.argv[1:])
 
-
         if options.show_version:
             print APPLICATION_NAME, __version__
             return 0
@@ -127,13 +131,14 @@ def parse_cmd_line(fn):
             return 0
 
         return fn(*args, **dict(version_filename=options.version_filename,
-                                 output_directory=options.output_directory,
-                                 log_directory=options.log_directory,
-                                 no_date=options.no_date,
-                                 tag=options.tag,
-                                 charset=options.charset,
-                                 sync_auto_inc=options.sync_auto_inc,
-                                 sync_comments=options.sync_comments))
+                                output_directory=options.output_directory,
+                                log_directory=options.log_directory,
+                                no_date=options.no_date,
+                                tag=options.tag,
+                                charset=options.charset,
+                                sync_auto_inc=options.sync_auto_inc,
+                                sync_comments=options.sync_comments))
+
     return processor
 
 
@@ -230,116 +235,116 @@ def app(sourcedb='', targetdb='', version_filename=False,
                                            no_date=no_date)
 
     ctx['type'] = "Patch Script"
-    pBuffer = utils.PatchBuffer(name=os.path.join(output_directory, p_fname),
-                                filters=filters, tpl=PATCH_TPL, ctx=ctx.copy(),
-                                version_filename=version_filename)
+    p_buffer = utils.PatchBuffer(name=os.path.join(output_directory, p_fname),
+                                 filters=filters, tpl=PATCH_TPL, ctx=ctx.copy(),
+                                 version_filename=version_filename)
 
     ctx['type'] = "Revert Script"
-    rBuffer = utils.PatchBuffer(name=os.path.join(output_directory, r_fname),
-                                filters=filters, tpl=PATCH_TPL, ctx=ctx.copy(),
-                                version_filename=version_filename)
+    r_buffer = utils.PatchBuffer(name=os.path.join(output_directory, r_fname),
+                                 filters=filters, tpl=PATCH_TPL, ctx=ctx.copy(),
+                                 version_filename=version_filename)
 
     db_selected = False
     for patch, revert in syncdb.sync_schema(source_obj.selected,
                                             target_obj.selected, options):
         if patch and revert:
             if not db_selected:
-                pBuffer.write(target_obj.selected.select() + '\n')
-                rBuffer.write(target_obj.selected.select() + '\n')
-                pBuffer.write(target_obj.selected.fk_checks(0) + '\n')
-                rBuffer.write(target_obj.selected.fk_checks(0) + '\n')
+                p_buffer.write(target_obj.selected.select() + '\n')
+                r_buffer.write(target_obj.selected.select() + '\n')
+                p_buffer.write(target_obj.selected.fk_checks(0) + '\n')
+                r_buffer.write(target_obj.selected.fk_checks(0) + '\n')
                 db_selected = True
 
-            pBuffer.write(patch + '\n')
-            rBuffer.write(revert + '\n')
+            p_buffer.write(patch + '\n')
+            r_buffer.write(revert + '\n')
 
     if db_selected:
-        pBuffer.write(target_obj.selected.fk_checks(1) + '\n')
-        rBuffer.write(target_obj.selected.fk_checks(1) + '\n')
+        p_buffer.write(target_obj.selected.fk_checks(1) + '\n')
+        r_buffer.write(target_obj.selected.fk_checks(1) + '\n')
 
     for patch, revert in syncdb.sync_views(source_obj.selected, target_obj.selected):
         if patch and revert:
             if not db_selected:
-                pBuffer.write(target_obj.selected.select() + '\n')
-                rBuffer.write(target_obj.selected.select() + '\n')
+                p_buffer.write(target_obj.selected.select() + '\n')
+                r_buffer.write(target_obj.selected.select() + '\n')
                 db_selected = True
 
-            pBuffer.write(patch + '\n')
-            rBuffer.write(revert + '\n')
+            p_buffer.write(patch + '\n')
+            r_buffer.write(revert + '\n')
 
     for patch, revert in syncdb.sync_triggers(source_obj.selected, target_obj.selected):
         if patch and revert:
             if not db_selected:
-                pBuffer.write(target_obj.selected.select() + '\n')
-                rBuffer.write(target_obj.selected.select() + '\n')
+                p_buffer.write(target_obj.selected.select() + '\n')
+                r_buffer.write(target_obj.selected.select() + '\n')
                 db_selected = True
 
-            pBuffer.write(patch + '\n')
-            rBuffer.write(revert + '\n')
+            p_buffer.write(patch + '\n')
+            r_buffer.write(revert + '\n')
 
     for patch, revert in syncdb.sync_procedures(source_obj.selected, target_obj.selected):
         if patch and revert:
 
             if not db_selected:
-                pBuffer.write(target_obj.selected.select() + '\n')
-                rBuffer.write(target_obj.selected.select() + '\n')
-                pBuffer.write(target_obj.selected.fk_checks(0) + '\n')
-                rBuffer.write(target_obj.selected.fk_checks(0) + '\n')
+                p_buffer.write(target_obj.selected.select() + '\n')
+                r_buffer.write(target_obj.selected.select() + '\n')
+                p_buffer.write(target_obj.selected.fk_checks(0) + '\n')
+                r_buffer.write(target_obj.selected.fk_checks(0) + '\n')
                 db_selected = True
 
-            pBuffer.write(patch + '\n')
-            rBuffer.write(revert + '\n')
+            p_buffer.write(patch + '\n')
+            r_buffer.write(revert + '\n')
 
     if db_selected:
-        pBuffer.write(target_obj.selected.fk_checks(1) + '\n')
-        rBuffer.write(target_obj.selected.fk_checks(1) + '\n')
+        p_buffer.write(target_obj.selected.fk_checks(1) + '\n')
+        r_buffer.write(target_obj.selected.fk_checks(1) + '\n')
 
     for patch, revert in syncdb.sync_views(source_obj.selected, target_obj.selected):
         if patch and revert:
             if not db_selected:
-                pBuffer.write(target_obj.selected.select() + '\n')
-                rBuffer.write(target_obj.selected.select() + '\n')
+                p_buffer.write(target_obj.selected.select() + '\n')
+                r_buffer.write(target_obj.selected.select() + '\n')
                 db_selected = True
 
-            pBuffer.write(patch + '\n')
-            rBuffer.write(revert + '\n')
+            p_buffer.write(patch + '\n')
+            r_buffer.write(revert + '\n')
 
     for patch, revert in syncdb.sync_triggers(source_obj.selected, target_obj.selected):
         if patch and revert:
             if not db_selected:
-                pBuffer.write(target_obj.selected.select() + '\n')
-                rBuffer.write(target_obj.selected.select() + '\n')
+                p_buffer.write(target_obj.selected.select() + '\n')
+                r_buffer.write(target_obj.selected.select() + '\n')
                 db_selected = True
 
-            pBuffer.write(patch + '\n')
-            rBuffer.write(revert + '\n')
+            p_buffer.write(patch + '\n')
+            r_buffer.write(revert + '\n')
 
     for patch, revert in syncdb.sync_procedures(source_obj.selected, target_obj.selected):
         if patch and revert:
             if not db_selected:
-                pBuffer.write(target_obj.selected.select() + '\n')
-                rBuffer.write(target_obj.selected.select() + '\n')
+                p_buffer.write(target_obj.selected.select() + '\n')
+                r_buffer.write(target_obj.selected.select() + '\n')
                 db_selected = True
 
-            pBuffer.write(patch + '\n')
-            rBuffer.write(revert + '\n')
+            p_buffer.write(patch + '\n')
+            r_buffer.write(revert + '\n')
 
-    if not pBuffer.modified:
+    if not p_buffer.modified:
         logging.info(("No migration scripts written."
                       " mysql://%s/%s and mysql://%s/%s were in sync.") %
                      (source_obj.host, source_obj.selected.name,
                       target_obj.host, target_obj.selected.name))
     else:
         try:
-            pBuffer.save()
-            rBuffer.save()
+            p_buffer.save()
+            r_buffer.save()
             logging.info("Migration scripts created for mysql://%s/%s\n"
                          "Patch Script: %s\nRevert Script: %s"
                          % (target_obj.host, target_obj.selected.name,
-                            pBuffer.name, rBuffer.name))
+                            p_buffer.name, r_buffer.name))
         except OSError, e:
-            pBuffer.delete()
-            rBuffer.delete()
+            p_buffer.delete()
+            r_buffer.delete()
             logging.error("Failed writing migration scripts. %s" % e)
             return 1
 
