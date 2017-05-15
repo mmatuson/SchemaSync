@@ -444,7 +444,7 @@ def sync_created_procedures(src, dest):
 def sync_dropped_procedures(src, dest):
     for p in dest:
         if p not in src:
-            yield dest[p].drop(), src[p].create()
+            yield dest[p].drop(), dest[p].create()
 
 
 def sync_modified_procedures(src, dest):
