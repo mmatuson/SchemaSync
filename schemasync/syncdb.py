@@ -17,6 +17,7 @@ def sync_schema(fromdb, todb, options):
         to migrate fromdb to todb. The tuple will always contain 2 strings,
         even if they are empty.
     """
+
     p, r = sync_database_options(fromdb, todb)
 
     if p and r:
