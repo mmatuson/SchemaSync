@@ -168,7 +168,8 @@ def app(sourcedb='', targetdb='', version_filename=False,
 
     console = logging.StreamHandler()
     console.setLevel(logging.DEBUG)
-    logging.getLogger('').addHandler(console)
+    if len(logging.getLogger('').handlers) <= 1:
+        logging.getLogger('').addHandler(console)
 
     if not sourcedb:
         logging.error("Source database URL not provided. Exiting.")
@@ -202,6 +203,30 @@ def app(sourcedb='', targetdb='', version_filename=False,
 
     if 'db' not in target_info:
         logging.error("Target database name not provided. Exiting.")
+        return 1
+
+    if source_info['db'] == '*' and target_info['db'] == '*':
+        from schemaobject.connection import DatabaseConnection
+
+        sourcedb_none = sourcedb[:-1]
+        targetdb_none = targetdb[:-1]
+        connection = DatabaseConnection()
+        connection.connect(sourcedb_none, charset='utf8')
+        sql_schema = """
+        SELECT SCHEMA_NAME FROM information_schema.SCHEMATA
+        WHERE SCHEMA_NAME NOT IN ('mysql', 'information_schema', 'performance_schema', 'sys')
+        """
+        schemas = connection.execute(sql_schema)
+        for schema_info in schemas:
+            db = schema_info['SCHEMA_NAME']
+            sourcedb = sourcedb_none + db
+            targetdb = targetdb_none + db
+            try:
+                app(sourcedb=sourcedb, targetdb=targetdb, version_filename=version_filename,
+                    output_directory=output_directory, log_directory=log_directory, no_date=no_date,
+                    tag=tag, charset=charset, sync_auto_inc=sync_auto_inc, sync_comments=sync_comments)
+            except schemaobject.connection.DatabaseError, e:
+                logging.error("MySQL Error %d: %s (Ignore)" % (e.args[0], e.args[1]))
         return 1
 
     source_obj = schemaobject.SchemaObject(sourcedb, charset)
