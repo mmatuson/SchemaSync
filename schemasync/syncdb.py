@@ -132,7 +132,7 @@ def sync_database_options(from_db, to_db):
     r = []
 
     for opt in from_db.options:
-        if from_db.options[opt] is not to_db.options[opt]:
+        if from_db.options[opt] != to_db.options[opt]:
             p.append(from_db.options[opt].create())
             r.append(to_db.options[opt].create())
 
