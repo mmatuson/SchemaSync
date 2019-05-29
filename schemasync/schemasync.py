@@ -25,9 +25,9 @@ __license__ = "Apache 2.0"
 warnings.simplefilter("ignore", DeprecationWarning)
 
 try:
-    import MySQLdb
-except ImportError:
-    print "Error: Missing Required Dependency MySQLdb."
+    import pymysql
+except ImportErrorPyMySQL:
+    print "Error: Missing Required Dependency PyMySQL."
     sys.exit(1)
 
 try:
