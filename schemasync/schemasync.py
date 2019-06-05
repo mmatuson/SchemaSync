@@ -320,40 +320,6 @@ def app(sourcedb='', targetdb='', version_filename=False,
             p_buffer.write(patch + '\n')
             r_buffer.write(revert + '\n')
 
-    if db_selected:
-        p_buffer.write(target_obj.selected.fk_checks(1) + '\n')
-        r_buffer.write(target_obj.selected.fk_checks(1) + '\n')
-
-    for patch, revert in syncdb.sync_views(source_obj.selected, target_obj.selected):
-        if patch and revert:
-            if not db_selected:
-                p_buffer.write(target_obj.selected.select() + '\n')
-                r_buffer.write(target_obj.selected.select() + '\n')
-                db_selected = True
-
-            p_buffer.write(patch + '\n')
-            r_buffer.write(revert + '\n')
-
-    for patch, revert in syncdb.sync_triggers(source_obj.selected, target_obj.selected):
-        if patch and revert:
-            if not db_selected:
-                p_buffer.write(target_obj.selected.select() + '\n')
-                r_buffer.write(target_obj.selected.select() + '\n')
-                db_selected = True
-
-            p_buffer.write(patch + '\n')
-            r_buffer.write(revert + '\n')
-
-    for patch, revert in syncdb.sync_procedures(source_obj.selected, target_obj.selected):
-        if patch and revert:
-            if not db_selected:
-                p_buffer.write(target_obj.selected.select() + '\n')
-                r_buffer.write(target_obj.selected.select() + '\n')
-                db_selected = True
-
-            p_buffer.write(patch + '\n')
-            r_buffer.write(revert + '\n')
-
     if not p_buffer.modified:
         logging.info(("No migration scripts written."
                       " mysql://%s/%s and mysql://%s/%s were in sync.") %
