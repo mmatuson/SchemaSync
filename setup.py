@@ -7,7 +7,7 @@ from setuptools import setup
 
 setup(
     name='SchemaSync',
-    version='0.9.5',
+    version='0.9.6',
     description='A MySQL Schema Synchronization Utility',
     author='Mitch Matuson, Mustafa Ozgur',
     packages=['schemasync'],
